@@ -24,17 +24,22 @@ jobs:
         run: chmod +x gradlew
 
       - name: Set up Android Emulator
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: actions/setup-android-emulator@v2
         with:
           api-level: 30
+          target: default
           arch: x86_64
+          emulator-version: '30.7.5'
           profile: Nexus 5
-          script: |
-            echo "no" | sdkmanager --install "system-images;android-30;default;x86_64"
-            echo "no" | avdmanager create avd --force --name test --abi default/x86_64 --package "system-images;android-30;default;x86_64"
-            emulator -avd test -no-window -no-audio &
-            android-wait-for-emulator
-            adb shell input keyevent 82
+
+      - name: Start Android Emulator
+        run: ${{ runner.tool_cache }}/android-emulator/emulator -avd test -no-window -no-audio &
+
+      - name: Wait for Emulator to start
+        run: adb wait-for-device
+
+      - name: Unlock Emulator
+        run: adb shell input keyevent 82
 
       - name: Build with Gradle
         run: ./gradlew build
