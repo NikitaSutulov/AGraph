@@ -26,3 +26,8 @@ jobs:
       run: ./gradlew build
     - name: Launch unit tests with Gradle
       run: ./gradlew test
+    - name: Launch instrumental tests with Gradle
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: 30
+        script: ./gradlew connectedCheck
