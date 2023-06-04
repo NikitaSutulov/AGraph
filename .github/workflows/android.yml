@@ -29,11 +29,12 @@ jobs:
         api-level: 30
         arch: x86_64
         profile: Nexus 5
+        script: ./gradlew connectedCheck
         
-    - name: Build and run instrumented tests
-      run: |
-        ./gradlew assembleDebugAndroidTest
-        ./gradlew connectedDebugAndroidTest
+#     - name: Build and run instrumented tests
+#       run: |
+#         ./gradlew assembleDebugAndroidTest
+#         ./gradlew connectedDebugAndroidTest
 
     - name: Build with Gradle
       run: ./gradlew build
