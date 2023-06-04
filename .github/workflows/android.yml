@@ -23,17 +23,20 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y mesa-utils libgl1-mesa-dev libqt5widgets5
+          sudo apt-get install -y libgles2-mesa-dev
+
       - name: Set up Android Emulator
-        uses: actions/setup-android-emulator@v2
+        uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 30
-          target: default
           arch: x86_64
-          emulator-version: '30.7.5'
           profile: Nexus 5
 
       - name: Start Android Emulator
-        run: ${{ runner.tool_cache }}/android-emulator/emulator -avd test -no-window -no-audio &
+        run: emulator -avd test -no-window -no-audio &
 
       - name: Wait for Emulator to start
         run: adb wait-for-device
