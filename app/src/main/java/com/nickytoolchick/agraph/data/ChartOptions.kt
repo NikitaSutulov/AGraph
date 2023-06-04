@@ -1,0 +1,16 @@
+package com.nickytoolchick.agraph.data
+
+import java.io.Serializable
+
+class ChartOptions() : Serializable {
+    var verticalStep: Float = 0f
+    var horizontalStep: Float = 0f
+    var isLogScaleX: Boolean = false
+    var isLogScaleY: Boolean = false
+    var isHorizontalLines: Boolean = false
+    var isVerticalLines: Boolean = false
+    var xMin: Float = 0f
+    var xMax: Float = 0f
+    var yMin: Float = 0f
+    var yMax: Float = 0f
+}
