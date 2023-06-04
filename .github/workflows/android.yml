@@ -25,8 +25,8 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt-get install -y mesa-utils libgl1-mesa-dev libqt5widgets5
-          sudo apt-get install -y libgles2-mesa-dev
+          brew install mesa
+          brew install qt
 
       - name: Set up Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
