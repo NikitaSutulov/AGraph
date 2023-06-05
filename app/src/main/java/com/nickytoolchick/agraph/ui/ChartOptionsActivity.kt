@@ -27,7 +27,7 @@ class ChartOptionsActivity : AppCompatActivity() {
 
         binding.submitChartOptionsButton.setOnClickListener {
             updateChartOptions()
-            mainActivityIntent.putExtra("result", Json.encodeToString(chartOptions))
+            mainActivityIntent.putExtra("newChartOptions", Json.encodeToString(chartOptions))
             setResult(Activity.RESULT_OK, mainActivityIntent)
             finish()
         }
@@ -75,7 +75,7 @@ class ChartOptionsActivity : AppCompatActivity() {
         }
     }
 
-    fun updateChartOptions() {
+    private fun updateChartOptions() {
         updateFromEditTexts()
         updateFromCheckedTextViews()
     }

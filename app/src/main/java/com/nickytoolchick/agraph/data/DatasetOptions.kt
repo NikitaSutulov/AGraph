@@ -1,10 +1,12 @@
 package com.nickytoolchick.agraph.data
 
-import android.graphics.Color
+import kotlinx.serialization.Serializable
 
-data class DatasetOptions(
-    val points: MutableList<Point>,
-    val color: Color,
-    val isSmooth: Boolean,
-    val strokeSize: Int
-)
+@Serializable
+class DatasetOptions() {
+    var points: Array<Pair<Float, Float>> = arrayOf()
+    var color: Int = 0
+    var isSmooth: Boolean = false
+    var strokeSize: Float = 6f
+    var pointRadius: Float = 10f
+}
