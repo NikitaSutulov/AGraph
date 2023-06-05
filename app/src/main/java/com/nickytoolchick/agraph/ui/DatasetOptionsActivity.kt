@@ -8,7 +8,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.nickytoolchick.agraph.data.DatasetOptions
-import com.nickytoolchick.agraph.data.Extras
+import com.nickytoolchick.agraph.data.Constants
 import com.nickytoolchick.agraph.databinding.ActivityDatasetOptionsBinding
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -35,7 +35,7 @@ class DatasetOptionsActivity : AppCompatActivity() {
 
         binding.submitDatasetOptionsButton.setOnClickListener {
             updateDatasetOptions()
-            mainActivityIntent.putExtra(Extras.NEW_DATASET_OPTIONS, Json.encodeToString(datasetOptions))
+            mainActivityIntent.putExtra(Constants.NEW_DATASET_OPTIONS, Json.encodeToString(datasetOptions))
             setResult(Activity.RESULT_OK, mainActivityIntent)
             finish()
         }
@@ -74,7 +74,7 @@ class DatasetOptionsActivity : AppCompatActivity() {
     }
 
     private fun loadDatasetOptions() {
-        datasetOptions = Json.decodeFromString(mainActivityIntent.getStringExtra(Extras.STABLE_DATASET_OPTIONS)!!)
+        datasetOptions = Json.decodeFromString(mainActivityIntent.getStringExtra(Constants.STABLE_DATASET_OPTIONS)!!)
         loadSpinner()
         loadEditTexts()
         loadSmoothnessCheckedTV()

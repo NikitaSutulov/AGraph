@@ -5,7 +5,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import com.nickytoolchick.agraph.data.ChartOptions
-import com.nickytoolchick.agraph.data.Extras
+import com.nickytoolchick.agraph.data.Constants
 import com.nickytoolchick.agraph.databinding.ActivityChartOptionsBinding
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -28,14 +28,14 @@ class ChartOptionsActivity : AppCompatActivity() {
 
         binding.submitChartOptionsButton.setOnClickListener {
             updateChartOptions()
-            mainActivityIntent.putExtra(Extras.NEW_CHART_OPTIONS, Json.encodeToString(chartOptions))
+            mainActivityIntent.putExtra(Constants.NEW_CHART_OPTIONS, Json.encodeToString(chartOptions))
             setResult(Activity.RESULT_OK, mainActivityIntent)
             finish()
         }
     }
 
     private fun loadChartOptions() {
-        chartOptions = Json.decodeFromString(mainActivityIntent.getStringExtra(Extras.STABLE_CHART_OPTIONS)!!)
+        chartOptions = Json.decodeFromString(mainActivityIntent.getStringExtra(Constants.STABLE_CHART_OPTIONS)!!)
         loadEditTexts()
         loadCheckedTextViews()
         handleCheckedTextViewsClick()

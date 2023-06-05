@@ -7,8 +7,10 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import com.nickytoolchick.agraph.data.ChartOptions
 import com.nickytoolchick.agraph.data.DatasetOptions
-import com.nickytoolchick.agraph.data.Extras
+import com.nickytoolchick.agraph.data.Constants
 import com.nickytoolchick.agraph.databinding.ActivityMainBinding
+import com.nickytoolchick.agraph.fileio.FileReader
+import com.nickytoolchick.agraph.fileio.FileWriter
 import com.nickytoolchick.agraph.ui.ChartOptionsActivity
 import com.nickytoolchick.agraph.ui.DatasetOptionsActivity
 import kotlinx.serialization.decodeFromString
@@ -26,25 +28,37 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.configureChartButton.setOnClickListener {
             val charOptionsIntent = Intent(this, ChartOptionsActivity::class.java)
-            charOptionsIntent.putExtra(Extras.STABLE_CHART_OPTIONS, Json.encodeToString(chartOptions))
+            charOptionsIntent.putExtra(Constants.STABLE_CHART_OPTIONS, Json.encodeToString(chartOptions))
             chartOptionsResultLauncher.launch(charOptionsIntent)
         }
         binding.configureDatasetButton.setOnClickListener {
             val datasetOptionsIntent = Intent(this, DatasetOptionsActivity::class.java)
-            datasetOptionsIntent.putExtra(Extras.STABLE_DATASET_OPTIONS, Json.encodeToString(datasetOptions))
+            datasetOptionsIntent.putExtra(Constants.STABLE_DATASET_OPTIONS, Json.encodeToString(datasetOptions))
             datasetOptionsResultLauncher.launch(datasetOptionsIntent)
+        }
+        binding.saveButton.setOnClickListener {
+            val fileWriter = FileWriter()
+            fileWriter.saveFile(this, chartOptions, datasetOptions)
+        }
+        binding.loadButton.setOnClickListener {
+            val fileReader = FileReader()
+            val loadedOptions = fileReader.readFile(this)
+            if (loadedOptions != null) {
+                chartOptions = loadedOptions.first
+                datasetOptions = loadedOptions.second
+            }
         }
     }
 
     private val chartOptionsResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            chartOptions = Json.decodeFromString(result.data?.getStringExtra(Extras.NEW_CHART_OPTIONS)!!)
+            chartOptions = Json.decodeFromString(result.data?.getStringExtra(Constants.NEW_CHART_OPTIONS)!!)
         }
     }
 
     private val datasetOptionsResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            datasetOptions = Json.decodeFromString(result.data?.getStringExtra(Extras.NEW_DATASET_OPTIONS)!!)
+            datasetOptions = Json.decodeFromString(result.data?.getStringExtra(Constants.NEW_DATASET_OPTIONS)!!)
         }
     }
 }
