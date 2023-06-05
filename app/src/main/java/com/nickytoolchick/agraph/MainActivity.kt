@@ -9,6 +9,9 @@ import androidx.activity.result.contract.ActivityResultContracts
 import com.nickytoolchick.agraph.data.ChartOptions
 import com.nickytoolchick.agraph.databinding.ActivityMainBinding
 import com.nickytoolchick.agraph.ui.ChartOptionsActivity
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,14 +23,14 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.configureChartButton.setOnClickListener {
             val configIntent = Intent(this, ChartOptionsActivity::class.java)
-            configIntent.putExtra("stableChartOptions", chartOptions)
+            configIntent.putExtra("stableChartOptions", Json.encodeToString(chartOptions))
             resultLauncher.launch(configIntent)
         }
     }
 
     private val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            chartOptions = result.data?.getSerializableExtra("result") as ChartOptions
+            chartOptions = Json.decodeFromString(result.data?.getStringExtra("result")!!)
             Log.d("chart", chartOptions.horizontalStep.toString())
         }
     }

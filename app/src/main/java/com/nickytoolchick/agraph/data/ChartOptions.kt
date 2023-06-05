@@ -1,8 +1,9 @@
 package com.nickytoolchick.agraph.data
 
-import java.io.Serializable
+import kotlinx.serialization.Serializable
 
-class ChartOptions() : Serializable {
+@Serializable
+class ChartOptions() {
     var verticalStep: Float = 0f
     var horizontalStep: Float = 0f
     var isLogScaleX: Boolean = false

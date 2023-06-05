@@ -4,9 +4,11 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.text.Editable
 import com.nickytoolchick.agraph.data.ChartOptions
 import com.nickytoolchick.agraph.databinding.ActivityChartOptionsBinding
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 
 class ChartOptionsActivity : AppCompatActivity() {
@@ -25,14 +27,14 @@ class ChartOptionsActivity : AppCompatActivity() {
 
         binding.submitChartOptionsButton.setOnClickListener {
             updateChartOptions()
-            mainActivityIntent.putExtra("result", chartOptions)
+            mainActivityIntent.putExtra("result", Json.encodeToString(chartOptions))
             setResult(Activity.RESULT_OK, mainActivityIntent)
             finish()
         }
     }
 
     private fun loadChartOptions() {
-        chartOptions = mainActivityIntent.getSerializableExtra("stableChartOptions") as ChartOptions
+        chartOptions = Json.decodeFromString(mainActivityIntent.getStringExtra("stableChartOptions")!!)
         loadEditTexts()
         loadCheckedTextViews()
         handleCheckedTextViewsClick()
