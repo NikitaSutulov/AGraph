@@ -7,8 +7,10 @@ import android.os.Bundle
 import androidx.activity.result.contract.ActivityResultContracts
 import com.nickytoolchick.agraph.data.ChartOptions
 import com.nickytoolchick.agraph.data.DatasetOptions
+import com.nickytoolchick.agraph.data.Extras
 import com.nickytoolchick.agraph.databinding.ActivityMainBinding
 import com.nickytoolchick.agraph.ui.ChartOptionsActivity
+import com.nickytoolchick.agraph.ui.DatasetOptionsActivity
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -24,25 +26,25 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.configureChartButton.setOnClickListener {
             val charOptionsIntent = Intent(this, ChartOptionsActivity::class.java)
-            charOptionsIntent.putExtra("stableChartOptions", Json.encodeToString(chartOptions))
+            charOptionsIntent.putExtra(Extras.STABLE_CHART_OPTIONS, Json.encodeToString(chartOptions))
             chartOptionsResultLauncher.launch(charOptionsIntent)
         }
         binding.configureDatasetButton.setOnClickListener {
             val datasetOptionsIntent = Intent(this, DatasetOptionsActivity::class.java)
-            datasetOptionsIntent.putExtra("stableDatasetOptions", Json.encodeToString(datasetOptions))
+            datasetOptionsIntent.putExtra(Extras.STABLE_DATASET_OPTIONS, Json.encodeToString(datasetOptions))
             datasetOptionsResultLauncher.launch(datasetOptionsIntent)
         }
     }
 
     private val chartOptionsResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            chartOptions = Json.decodeFromString(result.data?.getStringExtra("newChartOptions")!!)
+            chartOptions = Json.decodeFromString(result.data?.getStringExtra(Extras.NEW_CHART_OPTIONS)!!)
         }
     }
 
     private val datasetOptionsResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
-            datasetOptions = Json.decodeFromString(result.data?.getStringExtra("newDatasetOptions")!!)
+            datasetOptions = Json.decodeFromString(result.data?.getStringExtra(Extras.NEW_DATASET_OPTIONS)!!)
         }
     }
 }

@@ -1,12 +1,14 @@
-package com.nickytoolchick.agraph
+package com.nickytoolchick.agraph.ui
 
 import android.app.Activity
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.nickytoolchick.agraph.data.DatasetOptions
+import com.nickytoolchick.agraph.data.Extras
 import com.nickytoolchick.agraph.databinding.ActivityDatasetOptionsBinding
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -33,7 +35,7 @@ class DatasetOptionsActivity : AppCompatActivity() {
 
         binding.submitDatasetOptionsButton.setOnClickListener {
             updateDatasetOptions()
-            mainActivityIntent.putExtra("newDatasetOptions", Json.encodeToString(datasetOptions))
+            mainActivityIntent.putExtra(Extras.NEW_DATASET_OPTIONS, Json.encodeToString(datasetOptions))
             setResult(Activity.RESULT_OK, mainActivityIntent)
             finish()
         }
@@ -72,7 +74,7 @@ class DatasetOptionsActivity : AppCompatActivity() {
     }
 
     private fun loadDatasetOptions() {
-        datasetOptions = Json.decodeFromString(mainActivityIntent.getStringExtra("stableDatasetOptions")!!)
+        datasetOptions = Json.decodeFromString(mainActivityIntent.getStringExtra(Extras.STABLE_DATASET_OPTIONS)!!)
         loadSpinner()
         loadEditTexts()
         loadSmoothnessCheckedTV()
@@ -115,8 +117,7 @@ class DatasetOptionsActivity : AppCompatActivity() {
             points.add(newPoint)
             updatePointsTextView()
         } else {
-            val toast = Toast.makeText(this, "This point already exists!", Toast.LENGTH_LONG)
-            toast.show()
+            showToast(this, "This point already exists!")
         }
     }
 
@@ -128,8 +129,7 @@ class DatasetOptionsActivity : AppCompatActivity() {
             points.remove(pointToDelete)
             updatePointsTextView()
         } else {
-            val toast = Toast.makeText(this, "This point does not exist!", Toast.LENGTH_LONG)
-            toast.show()
+            showToast(this, "This point does not exist!")
         }
     }
 
@@ -139,5 +139,10 @@ class DatasetOptionsActivity : AppCompatActivity() {
             finalText += "${points[i].first} ${points[i].second}\n"
         }
         binding.pointsTV.text = finalText
+    }
+
+    private fun showToast(context: Context, message: String){
+        val toast = Toast.makeText(context, message, Toast.LENGTH_LONG)
+        toast.show()
     }
 }

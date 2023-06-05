@@ -13,7 +13,7 @@
         android:theme="@style/Theme.AGraph"
         tools:targetApi="31">
         <activity
-            android:name=".DatasetOptionsActivity"
+            android:name=".ui.DatasetOptionsActivity"
             android:exported="false" />
         <activity
             android:name=".ui.ChartOptionsActivity"
