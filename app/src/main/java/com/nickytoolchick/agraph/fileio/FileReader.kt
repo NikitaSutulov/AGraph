@@ -9,18 +9,18 @@ import kotlinx.serialization.json.Json
 import java.io.File
 
 class FileReader {
-    fun readFile(ctx: Context): Pair<ChartOptions, DatasetOptions>? {
+    fun readFile(ctx: Context): Pair<ChartOptions, DatasetOptions> {
         val file = File(ctx.filesDir, Constants.FILE_NAME)
 
         if (!file.exists()) {
-            return null
+            return createDefaultOptions()
         }
 
         try {
             val lines = file.readLines()
 
             if (lines.size != 3) {
-                return null
+                return createDefaultOptions()
             }
 
             val chartOptions = Json.decodeFromString<ChartOptions>(lines[0])
@@ -28,7 +28,11 @@ class FileReader {
 
             return Pair(chartOptions, datasetOptions)
         } catch (e: Exception) {
-            return null
+            return createDefaultOptions()
         }
+    }
+
+    private fun createDefaultOptions(): Pair<ChartOptions, DatasetOptions> {
+        return Pair(ChartOptions(), DatasetOptions())
     }
 }
