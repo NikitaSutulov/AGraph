@@ -1,7 +1,24 @@
 package com.nickytoolchick.agraph.fileio
 
-// This class will be used to write the chart and dataset data to an XML file
-// However, it's not implemented yet
+import android.content.Context
+import com.nickytoolchick.agraph.data.ChartOptions
+import com.nickytoolchick.agraph.data.Constants
+import com.nickytoolchick.agraph.data.DatasetOptions
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
+import java.io.File
+
 class FileWriter {
-    // TODO("Not implemented yet")
+    fun saveFile(ctx: Context, chartOptions: ChartOptions, datasetOptions: DatasetOptions) {
+        val path = ctx.filesDir
+        val file = File(path, Constants.FILE_NAME)
+        file.delete()
+        file.appendText(
+            convertToChartFile(chartOptions, datasetOptions)
+        )
+    }
+
+    fun convertToChartFile(chartOptions: ChartOptions, datasetOptions: DatasetOptions): String {
+        return Json.encodeToString(chartOptions) + Constants.SPLITTER + Json.encodeToString(datasetOptions)
+    }
 }
