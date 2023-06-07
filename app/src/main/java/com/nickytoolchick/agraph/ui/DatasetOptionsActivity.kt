@@ -22,7 +22,7 @@ class DatasetOptionsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDatasetOptionsBinding
     var points: MutableList<Pair<Float, Float>> = mutableListOf()
 
-    var colors = arrayOf(0, 1, 2, 3)
+    var colors = arrayOf("BLACK", "RED", "GREEN", "BLUE")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,7 +62,7 @@ class DatasetOptionsActivity : AppCompatActivity() {
     }
 
     private fun updateFromSpinner() {
-        datasetOptions.color = binding.colorSpinner.selectedItem.toString().toInt()
+        datasetOptions.color = binding.colorSpinner.selectedItemPosition
     }
 
     private fun updateFromCheckedTV() {

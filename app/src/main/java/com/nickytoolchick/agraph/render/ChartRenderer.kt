@@ -177,7 +177,7 @@ class ChartRenderer @JvmOverloads constructor(
     }
 
     private fun setupPaintForLineChart() {
-        paint.color = Color.BLACK
+        paint.color = getColorFromColorCode()
         paint.style = Paint.Style.STROKE
         paint.strokeWidth = datasetOptions.strokeSize
     }
@@ -216,5 +216,14 @@ class ChartRenderer @JvmOverloads constructor(
     fun setDatasetOptions(datasetOptions: DatasetOptions) {
         this.datasetOptions = datasetOptions
         Log.d("chart", "setting dataset options")
+    }
+
+    private fun getColorFromColorCode(): Int {
+        return when (datasetOptions.color) {
+            1 -> Color.RED
+            2 -> Color.GREEN
+            3 -> Color.BLUE
+            else -> Color.BLACK
+        }
     }
 }
