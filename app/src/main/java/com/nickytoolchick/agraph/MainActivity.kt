@@ -11,7 +11,9 @@ import com.nickytoolchick.agraph.data.Constants
 import com.nickytoolchick.agraph.databinding.ActivityMainBinding
 import com.nickytoolchick.agraph.fileio.FileReader
 import com.nickytoolchick.agraph.fileio.FileWriter
+import com.nickytoolchick.agraph.render.ChartRenderer
 import com.nickytoolchick.agraph.ui.ChartOptionsActivity
+import com.nickytoolchick.agraph.ui.ChartRenderActivity
 import com.nickytoolchick.agraph.ui.DatasetOptionsActivity
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
@@ -35,6 +37,13 @@ class MainActivity : AppCompatActivity() {
             val datasetOptionsIntent = Intent(this, DatasetOptionsActivity::class.java)
             datasetOptionsIntent.putExtra(Constants.STABLE_DATASET_OPTIONS, Json.encodeToString(datasetOptions))
             datasetOptionsResultLauncher.launch(datasetOptionsIntent)
+        }
+        binding.renderChartButton.setOnClickListener {
+            val chartRenderIntent = Intent(this, ChartRenderActivity::class.java).apply {
+                putExtra(Constants.STABLE_CHART_OPTIONS, Json.encodeToString(chartOptions))
+                putExtra(Constants.STABLE_DATASET_OPTIONS, Json.encodeToString(datasetOptions))
+            }
+            startActivity(chartRenderIntent)
         }
         binding.saveButton.setOnClickListener {
             val fileWriter = FileWriter()
