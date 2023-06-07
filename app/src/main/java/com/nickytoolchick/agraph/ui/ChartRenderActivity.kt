@@ -8,6 +8,7 @@ import com.nickytoolchick.agraph.data.ChartOptions
 import com.nickytoolchick.agraph.data.Constants
 import com.nickytoolchick.agraph.data.DatasetOptions
 import com.nickytoolchick.agraph.databinding.ActivityChartRenderBinding
+import com.nickytoolchick.agraph.fileio.FileWriter
 import com.nickytoolchick.agraph.render.ChartRenderer
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
@@ -27,6 +28,11 @@ class ChartRenderActivity : AppCompatActivity() {
         loadOptions()
         initChartRenderer()
         setContentView(binding.root)
+
+        binding.exportButton.setOnClickListener {
+            val fileWriter = FileWriter()
+            fileWriter.exportChartAsPng(binding.chartRenderer)
+        }
     }
 
     private fun initChartRenderer() {
