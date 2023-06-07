@@ -22,7 +22,7 @@ class DatasetOptionsActivity : AppCompatActivity() {
     private lateinit var binding: ActivityDatasetOptionsBinding
     var points: MutableList<Pair<Float, Float>> = mutableListOf()
 
-    var colors = arrayOf(0, 1, 2, 3)
+    var colors = arrayOf("BLACK", "RED", "GREEN", "BLUE")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -34,18 +34,24 @@ class DatasetOptionsActivity : AppCompatActivity() {
         loadDatasetOptions()
 
         binding.submitDatasetOptionsButton.setOnClickListener {
-            updateDatasetOptions()
-            mainActivityIntent.putExtra(Constants.NEW_DATASET_OPTIONS, Json.encodeToString(datasetOptions))
-            setResult(Activity.RESULT_OK, mainActivityIntent)
-            finish()
+            if (validateInput()) {
+                updateDatasetOptions()
+                mainActivityIntent.putExtra(Constants.NEW_DATASET_OPTIONS, Json.encodeToString(datasetOptions))
+                setResult(Activity.RESULT_OK, mainActivityIntent)
+                finish()
+            }
         }
 
         binding.addPointButton.setOnClickListener {
-            addPoint()
+            if (validateNewPoint()) {
+                addPoint()
+            }
         }
 
         binding.deletePointButton.setOnClickListener {
-            deletePoint()
+            if (validateNewPoint()) {
+                deletePoint()
+            }
         }
     }
 
@@ -62,7 +68,7 @@ class DatasetOptionsActivity : AppCompatActivity() {
     }
 
     private fun updateFromSpinner() {
-        datasetOptions.color = binding.colorSpinner.selectedItem.toString().toInt()
+        datasetOptions.color = binding.colorSpinner.selectedItemPosition
     }
 
     private fun updateFromCheckedTV() {
@@ -144,5 +150,37 @@ class DatasetOptionsActivity : AppCompatActivity() {
     private fun showToast(context: Context, message: String){
         val toast = Toast.makeText(context, message, Toast.LENGTH_LONG)
         toast.show()
+    }
+
+    private fun validateInput(): Boolean {
+        val viewsToCheck = listOf(
+            binding.strokeSizeEditText,
+            binding.pointRadiusEditText
+        )
+
+        for (i in viewsToCheck.indices) {
+            if (viewsToCheck[i].text.toString().isNullOrEmpty()) {
+                viewsToCheck[i].error = "This value must not be empty!"
+                return false
+            }
+            if (viewsToCheck[i].text.toString().toFloat() == 0f) {
+                viewsToCheck[i].error = "This value must not be zero!"
+                return false
+            }
+        }
+
+        if (binding.pointsTV.text.toString().isNullOrEmpty()) {
+            binding.pointsTV.error = "You must put in some points!"
+            return false
+        }
+        return true
+    }
+
+    fun validateNewPoint(): Boolean {
+        if (binding.newPointXEditText.text.toString().isNullOrEmpty()
+            || binding.newPointYEditText.text.toString().isNullOrEmpty()) {
+            return false
+        }
+        return true
     }
 }
