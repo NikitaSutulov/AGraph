@@ -22,7 +22,6 @@ class ChartRenderer @JvmOverloads constructor(
     private val path: Path = Path()
     private val paint: Paint = Paint(Paint.ANTI_ALIAS_FLAG)
     private val padding = 100f
-
     private val coordinatePaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = Color.DKGRAY
         textSize = 28f
@@ -31,8 +30,7 @@ class ChartRenderer @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
-
-        canvas.drawColor(Color.WHITE)
+        drawBackground(canvas)
         if (chartOptions.isHorizontalLines) {
             drawHorizontalLines(canvas)
         }
@@ -40,12 +38,15 @@ class ChartRenderer @JvmOverloads constructor(
             drawVerticalLines(canvas)
         }
         drawCoordinates(canvas)
-
         if (datasetOptions.isSmooth) {
             drawSmoothLineChart(canvas)
         } else {
             drawLineChart(canvas)
         }
+    }
+
+    private fun drawBackground(canvas: Canvas) {
+        canvas.drawColor(Color.WHITE)
     }
 
     private fun drawHorizontalLines(canvas: Canvas) {
@@ -82,7 +83,11 @@ class ChartRenderer @JvmOverloads constructor(
         val xRange = chartOptions.xMax - chartOptions.xMin
         val yRange = chartOptions.yMax - chartOptions.yMin
 
-        // Draw x-axis coordinate values
+        drawXCoordinates(canvas, contentWidth, xRange)
+        drawYCoordinates(canvas, contentHeight, yRange)
+    }
+
+    private fun drawXCoordinates(canvas: Canvas, contentWidth: Float, xRange: Float) {
         val xStep = chartOptions.horizontalStep
         var x = chartOptions.xMin
         while (x <= chartOptions.xMax) {
@@ -93,8 +98,9 @@ class ChartRenderer @JvmOverloads constructor(
             canvas.drawText(text, scaledX - textWidth / 2, yPos, coordinatePaint)
             x += xStep
         }
+    }
 
-        // Draw y-axis coordinate values
+    private fun drawYCoordinates(canvas: Canvas, contentHeight: Float, yRange: Float) {
         val yStep = chartOptions.verticalStep
         var y = chartOptions.yMin
         while (y <= chartOptions.yMax) {
@@ -108,71 +114,53 @@ class ChartRenderer @JvmOverloads constructor(
 
     private fun drawLineChart(canvas: Canvas) {
         val dataset = datasetOptions.points
+        setupPaintForLineChart()
 
-        // Set paint properties for drawing the line chart
-        paint.color = Color.BLACK
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = datasetOptions.strokeSize
+        val scaleX = calculateScaleX()
+        val scaleY = calculateScaleY()
 
-        // Calculate the scaling factors for x and y coordinates
-        val scaleX = (width - 2 * padding) / (chartOptions.xMax - chartOptions.xMin)
-        val scaleY = (height - 2 * padding) / (chartOptions.yMax - chartOptions.yMin)
-
-        // Move to the first data point
         val firstPoint = dataset[0]
-        val startX = padding + (firstPoint.first - chartOptions.xMin) * scaleX
-        val startY = height - padding - (firstPoint.second - chartOptions.yMin) * scaleY
+        val startX = calculateXCoordinate(firstPoint.first, scaleX)
+        val startY = calculateYCoordinate(firstPoint.second, scaleY)
         drawPoint(startX, startY, canvas)
         path.moveTo(startX, startY)
 
-        // Draw the line chart
         for (i in 1 until dataset.size) {
             val dataPoint = dataset[i]
-            val x = padding + (dataPoint.first - chartOptions.xMin) * scaleX
-            val y = height - padding - (dataPoint.second - chartOptions.yMin) * scaleY
+            val x = calculateXCoordinate(dataPoint.first, scaleX)
+            val y = calculateYCoordinate(dataPoint.second, scaleY)
             drawPoint(x, y, canvas)
             path.lineTo(x, y)
             Log.d("chart", "drawing point $x;$y")
         }
 
-        // Draw the path representing the line chart
         canvas.drawPath(path, paint)
-
-        // Reset the path for future use
-        path.reset()
+        resetPath()
         Log.d("chart", "drawing the chart")
         invalidate()
     }
 
     private fun drawSmoothLineChart(canvas: Canvas) {
         val dataset = datasetOptions.points
+        setupPaintForLineChart()
 
-        // Set paint properties for drawing the line chart
-        paint.color = Color.BLACK
-        paint.style = Paint.Style.STROKE
-        paint.strokeWidth = datasetOptions.strokeSize
+        val scaleX = calculateScaleX()
+        val scaleY = calculateScaleY()
 
-        // Calculate the scaling factors for x and y coordinates
-        val scaleX = (width - 2 * padding) / (chartOptions.xMax - chartOptions.xMin)
-        val scaleY = (height - 2 * padding) / (chartOptions.yMax - chartOptions.yMin)
-
-        // Move to the first data point
         val firstPoint = dataset[0]
-        val startX = padding + (firstPoint.first - chartOptions.xMin) * scaleX
-        val startY = height - padding - (firstPoint.second - chartOptions.yMin) * scaleY
+        val startX = calculateXCoordinate(firstPoint.first, scaleX)
+        val startY = calculateYCoordinate(firstPoint.second, scaleY)
         drawPoint(startX, startY, canvas)
         path.moveTo(startX, startY)
 
-        // Draw the line chart
         for (i in 1 until dataset.size) {
             val currentPoint = dataset[i]
             val previousPoint = dataset[i - 1]
 
-            // Calculate the control points for the cubic Bezier curve
-            val prevX = padding + (previousPoint.first - chartOptions.xMin) * scaleX
-            val prevY = height - padding - (previousPoint.second - chartOptions.yMin) * scaleY
-            val currX = padding + (currentPoint.first - chartOptions.xMin) * scaleX
-            val currY = height - padding - (currentPoint.second - chartOptions.yMin) * scaleY
+            val prevX = calculateXCoordinate(previousPoint.first, scaleX)
+            val prevY = calculateYCoordinate(previousPoint.second, scaleY)
+            val currX = calculateXCoordinate(currentPoint.first, scaleX)
+            val currY = calculateYCoordinate(currentPoint.second, scaleY)
             val controlX1 = prevX + (currX - prevX) / 2
             val controlX2 = prevX + (currX - prevX) / 2
 
@@ -182,12 +170,32 @@ class ChartRenderer @JvmOverloads constructor(
             Log.d("chart", "drawing point $currX;$currY")
         }
 
-        // Draw the path representing the line chart
         canvas.drawPath(path, paint)
-
-        // Reset the path for future use
-        path.reset()
+        resetPath()
         Log.d("chart", "drawing the chart")
+        invalidate()
+    }
+
+    private fun setupPaintForLineChart() {
+        paint.color = Color.BLACK
+        paint.style = Paint.Style.STROKE
+        paint.strokeWidth = datasetOptions.strokeSize
+    }
+
+    private fun calculateScaleX(): Float {
+        return (width - 2 * padding) / (chartOptions.xMax - chartOptions.xMin)
+    }
+
+    private fun calculateScaleY(): Float {
+        return (height - 2 * padding) / (chartOptions.yMax - chartOptions.yMin)
+    }
+
+    private fun calculateXCoordinate(x: Float, scaleX: Float): Float {
+        return padding + (x - chartOptions.xMin) * scaleX
+    }
+
+    private fun calculateYCoordinate(y: Float, scaleY: Float): Float {
+        return height - padding - (y - chartOptions.yMin) * scaleY
     }
 
     private fun drawPoint(x: Float, y: Float, canvas: Canvas) {
@@ -196,6 +204,9 @@ class ChartRenderer @JvmOverloads constructor(
         paint.style = Paint.Style.STROKE
     }
 
+    private fun resetPath() {
+        path.reset()
+    }
 
     fun setChartOptions(chartOptions: ChartOptions) {
         this.chartOptions = chartOptions
