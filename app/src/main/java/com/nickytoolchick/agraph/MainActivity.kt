@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         setButtonsOnClickListeners()
     }
@@ -58,18 +58,36 @@ class MainActivity : AppCompatActivity() {
             val loadedOptions = fileReader.readFile(this)
             chartOptions = loadedOptions.first
             datasetOptions = loadedOptions.second
+            validateOptions()
         }
     }
 
     private val chartOptionsResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             chartOptions = Json.decodeFromString(result.data?.getStringExtra(Constants.NEW_CHART_OPTIONS)!!)
+            validateOptions()
         }
     }
 
     private val datasetOptionsResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             datasetOptions = Json.decodeFromString(result.data?.getStringExtra(Constants.NEW_DATASET_OPTIONS)!!)
+            validateOptions()
         }
+    }
+
+    private fun validateOptions() {
+        val numbersToCheck = listOf(
+            chartOptions.horizontalStep,
+            chartOptions.verticalStep,
+            chartOptions.xMin,
+            chartOptions.xMax,
+            chartOptions.yMin,
+            chartOptions.yMax,
+            datasetOptions.strokeSize,
+            datasetOptions.pointRadius
+        )
+        binding.renderChartButton.isEnabled = (!numbersToCheck.any { it == 0f }
+                && datasetOptions.points.isNotEmpty())
     }
 }

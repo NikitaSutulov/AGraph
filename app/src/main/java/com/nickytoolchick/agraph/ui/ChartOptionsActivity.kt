@@ -4,6 +4,8 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.EditText
+import androidx.core.view.children
 import com.nickytoolchick.agraph.data.ChartOptions
 import com.nickytoolchick.agraph.data.Constants
 import com.nickytoolchick.agraph.databinding.ActivityChartOptionsBinding
@@ -27,10 +29,12 @@ class ChartOptionsActivity : AppCompatActivity() {
         loadChartOptions()
 
         binding.submitChartOptionsButton.setOnClickListener {
-            updateChartOptions()
-            mainActivityIntent.putExtra(Constants.NEW_CHART_OPTIONS, Json.encodeToString(chartOptions))
-            setResult(Activity.RESULT_OK, mainActivityIntent)
-            finish()
+            if (validateInput()) {
+                updateChartOptions()
+                mainActivityIntent.putExtra(Constants.NEW_CHART_OPTIONS, Json.encodeToString(chartOptions))
+                setResult(Activity.RESULT_OK, mainActivityIntent)
+                finish()
+            }
         }
     }
 
@@ -79,6 +83,29 @@ class ChartOptionsActivity : AppCompatActivity() {
     private fun updateChartOptions() {
         updateFromEditTexts()
         updateFromCheckedTextViews()
+    }
+
+    private fun validateInput(): Boolean {
+        val viewsToCheck = listOf(
+            binding.horizontalStepEditText,
+            binding.verticalStepEditText,
+            binding.xMinEditText,
+            binding.xMaxEditText,
+            binding.yMinEditText,
+            binding.yMaxEditText
+        )
+
+        for (i in viewsToCheck.indices) {
+            if (viewsToCheck[i].text.toString().isNullOrEmpty()) {
+                viewsToCheck[i].error = "This value must not be empty!"
+                return false
+            }
+            if (viewsToCheck[i].text.toString().toFloat() == 0f) {
+                viewsToCheck[i].error = "This value must not be zero!"
+                return false
+            }
+        }
+        return true
     }
 
     private fun updateFromEditTexts() {
