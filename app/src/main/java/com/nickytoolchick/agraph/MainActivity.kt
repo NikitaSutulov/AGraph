@@ -11,7 +11,6 @@ import com.nickytoolchick.agraph.data.Constants
 import com.nickytoolchick.agraph.databinding.ActivityMainBinding
 import com.nickytoolchick.agraph.fileio.FileReader
 import com.nickytoolchick.agraph.fileio.FileWriter
-import com.nickytoolchick.agraph.render.ChartRenderer
 import com.nickytoolchick.agraph.ui.ChartOptionsActivity
 import com.nickytoolchick.agraph.ui.ChartRenderActivity
 import com.nickytoolchick.agraph.ui.DatasetOptionsActivity
@@ -23,11 +22,16 @@ class MainActivity : AppCompatActivity() {
 
     private var chartOptions = ChartOptions()
     private var datasetOptions = DatasetOptions()
+    private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        setButtonsOnClickListeners()
+    }
+
+    private fun setButtonsOnClickListeners() {
         binding.configureChartButton.setOnClickListener {
             val charOptionsIntent = Intent(this, ChartOptionsActivity::class.java)
             charOptionsIntent.putExtra(Constants.STABLE_CHART_OPTIONS, Json.encodeToString(chartOptions))
@@ -52,10 +56,8 @@ class MainActivity : AppCompatActivity() {
         binding.loadButton.setOnClickListener {
             val fileReader = FileReader()
             val loadedOptions = fileReader.readFile(this)
-            if (loadedOptions != null) {
-                chartOptions = loadedOptions.first
-                datasetOptions = loadedOptions.second
-            }
+            chartOptions = loadedOptions.first
+            datasetOptions = loadedOptions.second
         }
     }
 
