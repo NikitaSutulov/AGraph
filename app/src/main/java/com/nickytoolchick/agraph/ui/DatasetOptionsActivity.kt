@@ -36,6 +36,7 @@ class DatasetOptionsActivity : AppCompatActivity() {
         binding.submitDatasetOptionsButton.setOnClickListener {
             if (validateInput()) {
                 updateDatasetOptions()
+                datasetOptions.points.sortBy { it.first }
                 mainActivityIntent.putExtra(Constants.NEW_DATASET_OPTIONS, Json.encodeToString(datasetOptions))
                 setResult(Activity.RESULT_OK, mainActivityIntent)
                 finish()
