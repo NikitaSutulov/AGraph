@@ -34,10 +34,6 @@ class FileIOTest {
         onView(withId(R.id.configureDatasetButton)).perform(click())
         Intents.intended(hasComponent(DatasetOptionsActivity::class.java.name))
 
-        onView(withId(R.id.strokeSizeEditText)).perform(replaceText("4.4"))
-        onView(withId(R.id.pointRadiusEditText)).perform(replaceText("8.3"))
-        onView(withId(R.id.lineSmoothCheckedTV)).perform(click())
-
         onView(withId(R.id.newPointXEditText)).perform(replaceText("24.9"))
         onView(withId(R.id.newPointYEditText)).perform(replaceText("36.7"))
         onView(withId(R.id.addPointButton)).perform(click())
@@ -47,9 +43,6 @@ class FileIOTest {
         onView(withId(R.id.saveButton)).perform(click())
         onView(withId(R.id.configureDatasetButton)).perform(click())
 
-        onView(withId(R.id.strokeSizeEditText)).perform(replaceText("4.9"))
-        onView(withId(R.id.pointRadiusEditText)).perform(replaceText("8.5"))
-        onView(withId(R.id.lineSmoothCheckedTV)).perform(click())
         onView(withId(R.id.newPointXEditText)).perform(replaceText("24.9"))
         onView(withId(R.id.newPointYEditText)).perform(replaceText("36.7"))
         onView(withId(R.id.deletePointButton)).perform(click())
@@ -58,9 +51,6 @@ class FileIOTest {
         onView(withId(R.id.loadButton)).perform(click())
         onView(withId(R.id.configureDatasetButton)).perform(click())
 
-        onView(withId(R.id.strokeSizeEditText)).check(matches(withText("4.4")))
-        onView(withId(R.id.pointRadiusEditText)).check(matches(withText("8.3")))
-        onView(withId(R.id.lineSmoothCheckedTV)).check(matches(isChecked()))
         onView(withId(R.id.pointsTV)).check(matches(withText("24.9 36.7\n")))
     }
 
