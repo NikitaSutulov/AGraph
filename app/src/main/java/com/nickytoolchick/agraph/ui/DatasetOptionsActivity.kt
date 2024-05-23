@@ -1,10 +1,10 @@
 package com.nickytoolchick.agraph.ui
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.nickytoolchick.agraph.data.DatasetOptions
@@ -21,8 +21,6 @@ class DatasetOptionsActivity : AppCompatActivity() {
     lateinit var mainActivityIntent: Intent
     private lateinit var binding: ActivityDatasetOptionsBinding
     var points: MutableList<Pair<Float, Float>> = mutableListOf()
-
-    var colors = arrayOf("BLACK", "RED", "GREEN", "BLUE")
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,61 +52,20 @@ class DatasetOptionsActivity : AppCompatActivity() {
                 deletePoint()
             }
         }
+
+        binding.deletePointButton.setOnLongClickListener {
+            showDeleteAllPointsDialog()
+            true
+        }
     }
 
     private fun updateDatasetOptions() {
-        updateFromEditTexts()
-        updateFromSpinner()
-        updateFromCheckedTV()
-        updateFromPointsList()
-    }
-
-    private fun updateFromEditTexts() {
-        datasetOptions.strokeSize = binding.strokeSizeEditText.text.toString().toFloat()
-        datasetOptions.pointRadius = binding.pointRadiusEditText.text.toString().toFloat()
-    }
-
-    private fun updateFromSpinner() {
-        datasetOptions.color = binding.colorSpinner.selectedItemPosition
-    }
-
-    private fun updateFromCheckedTV() {
-        datasetOptions.isSmooth = binding.lineSmoothCheckedTV.isChecked
-    }
-
-    private fun updateFromPointsList() {
         datasetOptions.points = points.toTypedArray()
     }
 
     private fun loadDatasetOptions() {
         datasetOptions = Json.decodeFromString(mainActivityIntent.getStringExtra(Constants.STABLE_DATASET_OPTIONS)!!)
-        loadSpinner()
-        loadEditTexts()
-        loadSmoothnessCheckedTV()
         loadPoints()
-        handleSmoothnessCheckedTVClick()
-        updatePointsTextView()
-    }
-
-    private fun handleSmoothnessCheckedTVClick() {
-        binding.lineSmoothCheckedTV.setOnClickListener {
-            binding.lineSmoothCheckedTV.isChecked = !binding.lineSmoothCheckedTV.isChecked
-        }
-    }
-
-    private fun loadSpinner() {
-        val arrayAdapter = ArrayAdapter(this, android.R.layout.simple_spinner_dropdown_item, colors)
-        binding.colorSpinner.adapter = arrayAdapter
-        binding.colorSpinner.setSelection(datasetOptions.color)
-    }
-
-    private fun loadEditTexts() {
-        binding.strokeSizeEditText.setText(datasetOptions.strokeSize.toString())
-        binding.pointRadiusEditText.setText(datasetOptions.pointRadius.toString())
-    }
-
-    private fun loadSmoothnessCheckedTV() {
-        binding.lineSmoothCheckedTV.isChecked = datasetOptions.isSmooth
     }
 
     private fun loadPoints() {
@@ -154,22 +111,6 @@ class DatasetOptionsActivity : AppCompatActivity() {
     }
 
     private fun validateInput(): Boolean {
-        val viewsToCheck = listOf(
-            binding.strokeSizeEditText,
-            binding.pointRadiusEditText
-        )
-
-        for (i in viewsToCheck.indices) {
-            if (viewsToCheck[i].text.toString().isNullOrEmpty()) {
-                viewsToCheck[i].error = "This value must not be empty!"
-                return false
-            }
-            if (viewsToCheck[i].text.toString().toFloat() == 0f) {
-                viewsToCheck[i].error = "This value must not be zero!"
-                return false
-            }
-        }
-
         if (binding.pointsTV.text.toString().isNullOrEmpty()) {
             binding.pointsTV.error = "You must put in some points!"
             return false
@@ -177,11 +118,26 @@ class DatasetOptionsActivity : AppCompatActivity() {
         return true
     }
 
-    fun validateNewPoint(): Boolean {
+    private fun validateNewPoint(): Boolean {
         if (binding.newPointXEditText.text.toString().isNullOrEmpty()
             || binding.newPointYEditText.text.toString().isNullOrEmpty()) {
             return false
         }
         return true
+    }
+
+    private fun showDeleteAllPointsDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Delete all points")
+        builder.setMessage("Do you really want to delete all points?")
+        builder.setPositiveButton("Yes") { dialog, _ ->
+            points.clear()
+            updatePointsTextView()
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("No") { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.create().show()
     }
 }

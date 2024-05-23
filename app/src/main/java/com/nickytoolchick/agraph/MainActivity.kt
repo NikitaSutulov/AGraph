@@ -84,8 +84,8 @@ class MainActivity : AppCompatActivity() {
             chartOptions.xMax,
             chartOptions.yMin,
             chartOptions.yMax,
-            datasetOptions.strokeSize,
-            datasetOptions.pointRadius
+            chartOptions.strokeSize,
+            chartOptions.pointRadius
         )
         binding.renderChartButton.isEnabled = (!numbersToCheck.any { it == 0f }
                 && datasetOptions.points.isNotEmpty())

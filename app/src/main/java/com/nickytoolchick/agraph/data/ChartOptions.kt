@@ -14,4 +14,8 @@ class ChartOptions() {
     var xMax: Float = 0f
     var yMin: Float = 0f
     var yMax: Float = 0f
+    var color: Int = 0
+    var isSmooth: Boolean = false
+    var strokeSize: Float = 6f
+    var pointRadius: Float = 10f
 }

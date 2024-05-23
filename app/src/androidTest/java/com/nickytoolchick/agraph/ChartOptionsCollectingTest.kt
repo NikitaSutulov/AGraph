@@ -63,6 +63,18 @@ class ChartOptionsCollectingTest {
         onView(withId(R.id.yMaxEditText)).perform(replaceText("4.2"))
         onView(withId(R.id.yMaxEditText)).check(matches(withText("4.2")))
 
+        onView(withId(R.id.strokeSizeEditText)).check(matches(withText("6.0")))
+        onView(withId(R.id.strokeSizeEditText)).perform(replaceText("4.4"))
+        onView(withId(R.id.strokeSizeEditText)).check(matches(withText("4.4")))
+
+        onView(withId(R.id.pointRadiusEditText)).check(matches(withText("10.0")))
+        onView(withId(R.id.pointRadiusEditText)).perform(replaceText("8.3"))
+        onView(withId(R.id.pointRadiusEditText)).check(matches(withText("8.3")))
+
+        onView(withId(R.id.lineSmoothCheckedTV)).check(matches(isNotChecked()))
+        onView(withId(R.id.lineSmoothCheckedTV)).perform(click())
+        onView(withId(R.id.lineSmoothCheckedTV)).check(matches(isChecked()))
+
         onView(withId(R.id.logScaleXCheckedTV)).check(matches(isNotChecked()))
         onView(withId(R.id.logScaleXCheckedTV)).perform(click())
         onView(withId(R.id.logScaleXCheckedTV)).check(matches(isChecked()))
@@ -88,7 +100,10 @@ class ChartOptionsCollectingTest {
         onView(withId(R.id.xMaxEditText)).check(matches(withText("3.4")))
         onView(withId(R.id.yMinEditText)).check(matches(withText("6.9")))
         onView(withId(R.id.yMaxEditText)).check(matches(withText("4.2")))
+        onView(withId(R.id.strokeSizeEditText)).check(matches(withText("4.4")))
+        onView(withId(R.id.pointRadiusEditText)).check(matches(withText("8.3")))
 
+        onView(withId(R.id.lineSmoothCheckedTV)).check(matches(isChecked()))
         onView(withId(R.id.logScaleXCheckedTV)).check(matches(isChecked()))
         onView(withId(R.id.logScaleYCheckedTV)).check(matches(isChecked()))
         onView(withId(R.id.showHorizontalLinesCheckedTV)).check(matches(isChecked()))
