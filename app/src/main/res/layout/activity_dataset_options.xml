@@ -73,7 +73,7 @@
 
             <Button
                 android:id="@+id/addPointButton"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="30dp"
                 android:layout_weight="1"
@@ -81,7 +81,7 @@
 
             <Button
                 android:id="@+id/deletePointButton"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginHorizontal="30dp"
                 android:layout_weight="1"

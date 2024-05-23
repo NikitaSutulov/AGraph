@@ -1,6 +1,7 @@
 package com.nickytoolchick.agraph.ui
 
 import android.app.Activity
+import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
@@ -50,6 +51,11 @@ class DatasetOptionsActivity : AppCompatActivity() {
             if (validateNewPoint()) {
                 deletePoint()
             }
+        }
+
+        binding.deletePointButton.setOnLongClickListener {
+            showDeleteAllPointsDialog()
+            true
         }
     }
 
@@ -118,5 +124,20 @@ class DatasetOptionsActivity : AppCompatActivity() {
             return false
         }
         return true
+    }
+
+    private fun showDeleteAllPointsDialog() {
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Delete all points")
+        builder.setMessage("Do you really want to delete all points?")
+        builder.setPositiveButton("Yes") { dialog, _ ->
+            points.clear()
+            updatePointsTextView()
+            dialog.dismiss()
+        }
+        builder.setNegativeButton("No") { dialog, _ ->
+            dialog.dismiss()
+        }
+        builder.create().show()
     }
 }
