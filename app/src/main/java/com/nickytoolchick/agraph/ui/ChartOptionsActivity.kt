@@ -1,9 +1,11 @@
 package com.nickytoolchick.agraph.ui
 
+import android.R
 import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.EditText
 import androidx.core.view.children
 import com.nickytoolchick.agraph.data.ChartOptions
@@ -16,6 +18,7 @@ import kotlinx.serialization.json.Json
 
 class ChartOptionsActivity : AppCompatActivity() {
 
+    var colors = arrayOf("BLACK", "RED", "GREEN", "BLUE")
     var chartOptions = ChartOptions()
     lateinit var mainActivityIntent: Intent
     private lateinit var binding: ActivityChartOptionsBinding
@@ -41,6 +44,7 @@ class ChartOptionsActivity : AppCompatActivity() {
     private fun loadChartOptions() {
         chartOptions = Json.decodeFromString(mainActivityIntent.getStringExtra(Constants.STABLE_CHART_OPTIONS)!!)
         loadEditTexts()
+        loadSpinner()
         loadCheckedTextViews()
         handleCheckedTextViewsClick()
 
@@ -53,6 +57,14 @@ class ChartOptionsActivity : AppCompatActivity() {
         binding.xMaxEditText.setText(chartOptions.xMax.toString())
         binding.yMinEditText.setText(chartOptions.yMin.toString())
         binding.yMaxEditText.setText(chartOptions.yMax.toString())
+        binding.strokeSizeEditText.setText(chartOptions.strokeSize.toString())
+        binding.pointRadiusEditText.setText(chartOptions.pointRadius.toString())
+    }
+
+    private fun loadSpinner() {
+        val arrayAdapter = ArrayAdapter(this, R.layout.simple_spinner_dropdown_item, colors)
+        binding.colorSpinner.adapter = arrayAdapter
+        binding.colorSpinner.setSelection(chartOptions.color)
     }
 
     private fun loadCheckedTextViews() {
@@ -60,6 +72,7 @@ class ChartOptionsActivity : AppCompatActivity() {
         binding.logScaleYCheckedTV.isChecked = chartOptions.isLogScaleY
         binding.showHorizontalLinesCheckedTV.isChecked = chartOptions.isHorizontalLines
         binding.showVerticalLinesCheckedTV.isChecked = chartOptions.isVerticalLines
+        binding.lineSmoothCheckedTV.isChecked = chartOptions.isSmooth
     }
 
     private fun handleCheckedTextViewsClick() {
@@ -78,10 +91,14 @@ class ChartOptionsActivity : AppCompatActivity() {
         binding.showVerticalLinesCheckedTV.setOnClickListener {
             binding.showVerticalLinesCheckedTV.isChecked = !binding.showVerticalLinesCheckedTV.isChecked
         }
+        binding.lineSmoothCheckedTV.setOnClickListener {
+            binding.lineSmoothCheckedTV.isChecked = !binding.lineSmoothCheckedTV.isChecked
+        }
     }
 
     private fun updateChartOptions() {
         updateFromEditTexts()
+        updateFromSpinner()
         updateFromCheckedTextViews()
     }
 
@@ -92,7 +109,9 @@ class ChartOptionsActivity : AppCompatActivity() {
             binding.xMinEditText,
             binding.xMaxEditText,
             binding.yMinEditText,
-            binding.yMaxEditText
+            binding.yMaxEditText,
+            binding.strokeSizeEditText,
+            binding.pointRadiusEditText
         )
 
         for (i in viewsToCheck.indices) {
@@ -115,7 +134,12 @@ class ChartOptionsActivity : AppCompatActivity() {
         chartOptions.xMax = binding.xMaxEditText.text.toString().toFloat()
         chartOptions.yMin = binding.yMinEditText.text.toString().toFloat()
         chartOptions.yMax = binding.yMaxEditText.text.toString().toFloat()
+        chartOptions.strokeSize = binding.strokeSizeEditText.text.toString().toFloat()
+        chartOptions.pointRadius = binding.pointRadiusEditText.text.toString().toFloat()
+    }
 
+    private fun updateFromSpinner() {
+        chartOptions.color = binding.colorSpinner.selectedItemPosition
     }
 
     private fun updateFromCheckedTextViews() {
@@ -123,5 +147,6 @@ class ChartOptionsActivity : AppCompatActivity() {
         chartOptions.isLogScaleY = binding.logScaleYCheckedTV.isChecked
         chartOptions.isHorizontalLines = binding.showHorizontalLinesCheckedTV.isChecked
         chartOptions.isVerticalLines = binding.showVerticalLinesCheckedTV.isChecked
+        chartOptions.isSmooth = binding.lineSmoothCheckedTV.isChecked
     }
 }

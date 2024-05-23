@@ -19,11 +19,11 @@ class FileConversionUnitTest {
 
     @Test
     fun checkChartWithChangedParameters() {
-        val changedChartOptions = ChartOptions().apply { verticalStep = 7f }
-        val changedDatasetOptions = DatasetOptions().apply { isSmooth = true }
+        val changedChartOptions = ChartOptions().apply { verticalStep = 7f; isSmooth = true }
+        val datasetOptions = DatasetOptions()
         val fileWriter = FileWriter()
-        val expectedConvertedFileString = """{"verticalStep":7.0}${Constants.SPLITTER}{"points":[],"isSmooth":true}"""
-        assertEquals(expectedConvertedFileString, fileWriter.convertToChartFile(changedChartOptions, changedDatasetOptions))
+        val expectedConvertedFileString = """{"verticalStep":7.0,"isSmooth":true}${Constants.SPLITTER}{"points":[]}"""
+        assertEquals(expectedConvertedFileString, fileWriter.convertToChartFile(changedChartOptions, datasetOptions))
     }
 
     @Test
@@ -33,11 +33,12 @@ class FileConversionUnitTest {
             isLogScaleY = true
             isHorizontalLines = true
             isVerticalLines = true
+            isSmooth = true
         }
-        val changedDatasetOptions = DatasetOptions().apply { isSmooth = true }
+        val datasetOptions = DatasetOptions()
         val fileWriter = FileWriter()
-        val expectedConvertedFileString = """{"isLogScaleX":true,"isLogScaleY":true,"isHorizontalLines":true,"isVerticalLines":true}${Constants.SPLITTER}{"points":[],"isSmooth":true}"""
-        assertEquals(expectedConvertedFileString, fileWriter.convertToChartFile(changedChartOptions, changedDatasetOptions))
+        val expectedConvertedFileString = """{"isLogScaleX":true,"isLogScaleY":true,"isHorizontalLines":true,"isVerticalLines":true,"isSmooth":true}${Constants.SPLITTER}{"points":[]}"""
+        assertEquals(expectedConvertedFileString, fileWriter.convertToChartFile(changedChartOptions, datasetOptions))
     }
 
     @Test

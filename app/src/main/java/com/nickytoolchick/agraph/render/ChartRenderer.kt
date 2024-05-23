@@ -40,7 +40,7 @@ class ChartRenderer @JvmOverloads constructor(
             drawVerticalLines(canvas)
         }
         drawCoordinates(canvas)
-        if (datasetOptions.isSmooth) {
+        if (chartOptions.isSmooth) {
             drawSmoothLineChart(canvas)
         } else {
             drawLineChart(canvas)
@@ -269,7 +269,7 @@ class ChartRenderer @JvmOverloads constructor(
     private fun setupPaintForLineChart() {
         paint.color = getColorFromColorCode()
         paint.style = Paint.Style.STROKE
-        paint.strokeWidth = datasetOptions.strokeSize
+        paint.strokeWidth = chartOptions.strokeSize
     }
 
     private fun calculateScaleX(): Float {
@@ -312,7 +312,7 @@ class ChartRenderer @JvmOverloads constructor(
 
     private fun drawPoint(x: Float, y: Float, canvas: Canvas) {
         paint.style = Paint.Style.FILL
-        canvas.drawCircle(x, y, datasetOptions.pointRadius, paint)
+        canvas.drawCircle(x, y, chartOptions.pointRadius, paint)
         paint.style = Paint.Style.STROKE
     }
 
@@ -331,7 +331,7 @@ class ChartRenderer @JvmOverloads constructor(
     }
 
     private fun getColorFromColorCode(): Int {
-        return when (datasetOptions.color) {
+        return when (chartOptions.color) {
             1 -> Color.RED
             2 -> Color.GREEN
             3 -> Color.BLUE
