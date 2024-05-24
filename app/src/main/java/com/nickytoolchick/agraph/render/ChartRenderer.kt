@@ -5,6 +5,7 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
+import android.graphics.PointF
 import android.util.AttributeSet
 import android.util.Log
 import android.view.View
@@ -237,33 +238,47 @@ class ChartRenderer @JvmOverloads constructor(
         val scaleX = calculateScaleX()
         val scaleY = calculateScaleY()
 
-        val firstPoint = dataset[0]
-        val startX = calculateXCoordinate(firstPoint.first, scaleX)
-        val startY = calculateYCoordinate(firstPoint.second, scaleY)
-        drawPoint(startX, startY, canvas)
-        path.moveTo(startX, startY)
+        if (dataset.size < 2) return
 
-        for (i in 1 until dataset.size) {
-            val currentPoint = dataset[i]
-            val previousPoint = dataset[i - 1]
+        val points = dataset.map { PointF(calculateXCoordinate(it.first, scaleX), calculateYCoordinate(it.second, scaleY)) }
 
-            val prevX = calculateXCoordinate(previousPoint.first, scaleX)
-            val prevY = calculateYCoordinate(previousPoint.second, scaleY)
-            val currX = calculateXCoordinate(currentPoint.first, scaleX)
-            val currY = calculateYCoordinate(currentPoint.second, scaleY)
-            val controlX1 = prevX + (currX - prevX) / 2
-            val controlX2 = prevX + (currX - prevX) / 2
+        val firstPoint = points[0]
+        drawPoint(firstPoint.x, firstPoint.y, canvas)
+        path.moveTo(firstPoint.x, firstPoint.y)
 
-            path.cubicTo(controlX1, prevY, controlX2, currY, currX, currY)
+        for (i in 1 until points.size - 2) {
+            val p0 = points[i - 1]
+            val p1 = points[i]
+            val p2 = points[i + 1]
+            val p3 = points[i + 2]
 
-            drawPoint(currX, currY, canvas)
-            Log.d("chart", "drawing point $currX;$currY")
+            drawPoint(p1.x, p1.y, canvas)
+
+            for (t in 0..100) {
+                val tScaled = t / 100f
+                val x = catmullRom(p0.x, p1.x, p2.x, p3.x, tScaled)
+                val y = catmullRom(p0.y, p1.y, p2.y, p3.y, tScaled)
+                path.lineTo(x, y)
+            }
         }
+
+        val penultimatePoint = points[points.size - 2]
+        val lastPoint = points[points.size - 1]
+        path.lineTo(lastPoint.x, lastPoint.y)
+
+        drawPoint(penultimatePoint.x, penultimatePoint.y, canvas)
+        drawPoint(lastPoint.x, lastPoint.y, canvas)
 
         canvas.drawPath(path, paint)
         resetPath()
-        Log.d("chart", "drawing the chart")
         invalidate()
+    }
+
+    private fun catmullRom(p0: Float, p1: Float, p2: Float, p3: Float, t: Float): Float {
+        val t2 = t * t
+        val t3 = t2 * t
+
+        return 0.5f * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
     }
 
     private fun setupPaintForLineChart() {
