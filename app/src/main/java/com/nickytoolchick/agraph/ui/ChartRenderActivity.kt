@@ -20,6 +20,8 @@ class ChartRenderActivity : AppCompatActivity() {
     lateinit var mainActivityIntent: Intent
     private lateinit var binding: ActivityChartRenderBinding
 
+    private val fileWriter = FileWriter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityChartRenderBinding.inflate(layoutInflater)
@@ -30,8 +32,11 @@ class ChartRenderActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         binding.exportButton.setOnClickListener {
-            val fileWriter = FileWriter()
             fileWriter.exportChartAsPng(binding.chartRenderer)
+        }
+
+        binding.shareButton.setOnClickListener {
+            fileWriter.shareChart(this, binding.chartRenderer)
         }
     }
 

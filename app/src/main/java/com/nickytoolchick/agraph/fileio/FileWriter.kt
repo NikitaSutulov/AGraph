@@ -1,11 +1,14 @@
 package com.nickytoolchick.agraph.fileio
 
 import android.content.Context
+import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.media.MediaScannerConnection
+import android.net.Uri
 import android.os.Environment
 import android.widget.Toast
+import androidx.core.content.FileProvider
 import com.nickytoolchick.agraph.data.ChartOptions
 import com.nickytoolchick.agraph.data.Constants
 import com.nickytoolchick.agraph.data.DatasetOptions
@@ -32,7 +35,7 @@ class FileWriter {
         return Json.encodeToString(chartOptions) + Constants.SPLITTER + Json.encodeToString(datasetOptions)
     }
 
-    fun exportChartAsPng(chartRenderer: ChartRenderer) {
+    fun exportChartAsPng(chartRenderer: ChartRenderer): File? {
         val bitmap = Bitmap.createBitmap(chartRenderer.width, chartRenderer.height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
         chartRenderer.draw(canvas)
@@ -51,14 +54,30 @@ class FileWriter {
                 null
             )
             Toast.makeText(chartRenderer.context, "Chart exported to gallery", Toast.LENGTH_SHORT).show()
+            return file
         } catch (e: IOException) {
             e.printStackTrace()
             Toast.makeText(chartRenderer.context, "Export failed", Toast.LENGTH_SHORT).show()
+            return null
         }
     }
 
     private fun generateImageFileName(): String {
         val formatter = DateTimeFormatter.ofPattern("yyyy_MM_dd_HH_mm_ss_SSS")
         return "chart${LocalDateTime.now().format(formatter)}.png"
+    }
+
+    fun shareChart(ctx: Context, chartRenderer: ChartRenderer) {
+        val file = exportChartAsPng(chartRenderer)
+        file?.let {
+            val uri: Uri = FileProvider.getUriForFile(ctx, "com.nickytoolchick.agraph.fileprovider", it)
+            val shareIntent: Intent = Intent().apply {
+                action = Intent.ACTION_SEND
+                putExtra(Intent.EXTRA_STREAM, uri)
+                type = "image/png"
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
+            ctx.startActivity(Intent.createChooser(shareIntent, "Share chart via"))
+        }
     }
 }
