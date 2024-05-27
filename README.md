@@ -25,16 +25,3 @@ $ ./gradlew assembleDebug
 ```
 $ ./gradlew installDebug
 ```
-Детально з дизайн-документом цього проєкту можна ознайомитися за [цим посиланням](https://docs.google.com/document/d/169SeufuUD9Q-0isuVccKdIaLiOtNQs1sj64bZP-lbZc).
-
-Пул реквести, на які код рев'ю зроблено мною:
-- https://github.com/michigang1/healthcare-app/pull/2
-- https://github.com/michigang1/healthcare-app/pull/3
-- https://github.com/michigang1/healthcare-app/pull/4
-- https://github.com/michigang1/healthcare-app/pull/5
-
-Пул реквести, на які рев'ю зробили мені:
-- https://github.com/NikitaSutulov/AGraph/pull/1
-- https://github.com/NikitaSutulov/AGraph/pull/2
-- https://github.com/NikitaSutulov/AGraph/pull/3
-- https://github.com/NikitaSutulov/AGraph/pull/4
