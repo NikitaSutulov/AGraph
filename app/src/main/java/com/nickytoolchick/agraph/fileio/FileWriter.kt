@@ -28,7 +28,7 @@ class FileWriter {
         file.writeText(convertToChartFile(chartOptions, datasetOptions))
     }
 
-    private fun convertToChartFile(
+    fun convertToChartFile(
         chartOptions: ChartOptions,
         datasetOptions: DatasetOptions
     ): String {
