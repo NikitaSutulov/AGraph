@@ -22,43 +22,61 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 class FileWriter {
+
     fun saveFile(ctx: Context, chartOptions: ChartOptions, datasetOptions: DatasetOptions) {
-        val path = ctx.filesDir
-        val file = File(path, Constants.FILE_NAME)
-        file.delete()
-        file.appendText(
-            convertToChartFile(chartOptions, datasetOptions)
+        val file = File(ctx.filesDir, Constants.FILE_NAME)
+        file.writeText(convertToChartFile(chartOptions, datasetOptions))
+    }
+
+    private fun convertToChartFile(
+        chartOptions: ChartOptions,
+        datasetOptions: DatasetOptions
+    ): String {
+        return Json.encodeToString(chartOptions) + Constants.SPLITTER + Json.encodeToString(
+            datasetOptions
         )
     }
 
-    fun convertToChartFile(chartOptions: ChartOptions, datasetOptions: DatasetOptions): String {
-        return Json.encodeToString(chartOptions) + Constants.SPLITTER + Json.encodeToString(datasetOptions)
-    }
-
     fun exportChartAsPng(chartRenderer: ChartRenderer): File? {
-        val bitmap = Bitmap.createBitmap(chartRenderer.width, chartRenderer.height, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        chartRenderer.draw(canvas)
+        val bitmap = createBitmapFromChart(chartRenderer)
+        val galleryDir = File(
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+            "Charts"
+        )
 
-        val galleryDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES)
+        if (!galleryDir.exists()) {
+            galleryDir.mkdirs()
+        }
+
         val file = File(galleryDir, generateImageFileName())
-        try {
-            val outputStream = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
-            outputStream.flush()
-            outputStream.close()
+        return try {
+            FileOutputStream(file).use { outputStream ->
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream)
+            }
             MediaScannerConnection.scanFile(
                 chartRenderer.context,
                 arrayOf(file.absolutePath),
                 null,
                 null
             )
-            Toast.makeText(chartRenderer.context, "Chart exported to gallery", Toast.LENGTH_SHORT).show()
-            return file
+            Toast.makeText(chartRenderer.context, "Chart exported to gallery", Toast.LENGTH_SHORT)
+                .show()
+            file
         } catch (e: IOException) {
             e.printStackTrace()
             Toast.makeText(chartRenderer.context, "Export failed", Toast.LENGTH_SHORT).show()
-            return null
+            null
+        }
+    }
+
+    private fun createBitmapFromChart(chartRenderer: ChartRenderer): Bitmap {
+        return Bitmap.createBitmap(
+            chartRenderer.width,
+            chartRenderer.height,
+            Bitmap.Config.ARGB_8888
+        ).apply {
+            val canvas = Canvas(this)
+            chartRenderer.draw(canvas)
         }
     }
 
@@ -68,9 +86,9 @@ class FileWriter {
     }
 
     fun shareChart(ctx: Context, chartRenderer: ChartRenderer) {
-        val file = exportChartAsPng(chartRenderer)
-        file?.let {
-            val uri: Uri = FileProvider.getUriForFile(ctx, "com.nickytoolchick.agraph.fileprovider", it)
+        exportChartAsPng(chartRenderer)?.let { file ->
+            val uri: Uri =
+                FileProvider.getUriForFile(ctx, "com.nickytoolchick.agraph.fileprovider", file)
             val shareIntent: Intent = Intent().apply {
                 action = Intent.ACTION_SEND
                 putExtra(Intent.EXTRA_STREAM, uri)
