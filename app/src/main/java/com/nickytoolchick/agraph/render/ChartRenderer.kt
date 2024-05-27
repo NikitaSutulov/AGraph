@@ -34,18 +34,11 @@ class ChartRenderer @JvmOverloads constructor(
     override fun onDraw(canvas: Canvas) {
         super.onDraw(canvas)
         drawBackground(canvas)
-        if (chartOptions.isHorizontalLines) {
-            drawHorizontalLines(canvas)
-        }
-        if (chartOptions.isVerticalLines) {
-            drawVerticalLines(canvas)
-        }
+        if (chartOptions.isHorizontalLines) drawHorizontalLines(canvas)
+        if (chartOptions.isVerticalLines) drawVerticalLines(canvas)
         drawCoordinates(canvas)
-        if (chartOptions.isSmooth) {
-            drawSmoothLineChart(canvas)
-        } else {
-            drawLineChart(canvas)
-        }
+        if (chartOptions.isSmooth) drawSmoothLineChart(canvas) else drawLineChart(canvas)
+        drawPoints(canvas)
     }
 
     private fun drawBackground(canvas: Canvas) {
@@ -53,60 +46,68 @@ class ChartRenderer @JvmOverloads constructor(
     }
 
     private fun drawHorizontalLines(canvas: Canvas) {
-        val startY = chartOptions.yMin
-        val endY = chartOptions.yMax
         val contentHeight = height - padding * 2
 
         if (chartOptions.isLogScaleY) {
-            val yMinLog = log10(chartOptions.yMin)
-            val yMaxLog = log10(chartOptions.yMax)
-            val yRangeLog = yMaxLog - yMinLog
-
-            var i = yMinLog.toInt()
-            while (i <= yMaxLog.toInt()) {
-                val y = 10.0.pow(i.toDouble()).toFloat()
-                val scaledY = height - padding - ((log10(y) - yMinLog) * contentHeight) / yRangeLog
-                canvas.drawLine(padding, scaledY, width.toFloat() - padding, scaledY, coordinatePaint)
-                i++
-            }
+            drawLogScaleHorizontalLines(canvas, contentHeight)
         } else {
-            val yRange = chartOptions.yMax - chartOptions.yMin
+            drawLinearScaleHorizontalLines(canvas, contentHeight)
+        }
+    }
 
-            var y = startY
-            while (y <= endY) {
-                val scaledY = height - padding - (y - chartOptions.yMin) * contentHeight / yRange
-                canvas.drawLine(padding, scaledY, width.toFloat() - padding, scaledY, coordinatePaint)
-                y += chartOptions.verticalStep
-            }
+    private fun drawLogScaleHorizontalLines(canvas: Canvas, contentHeight: Float) {
+        val yMinLog = log10(chartOptions.yMin)
+        val yMaxLog = log10(chartOptions.yMax)
+        val yRangeLog = yMaxLog - yMinLog
+
+        for (i in yMinLog.toInt()..yMaxLog.toInt()) {
+            val y = 10.0.pow(i.toDouble()).toFloat()
+            val scaledY = height - padding - ((log10(y) - yMinLog) * contentHeight) / yRangeLog
+            canvas.drawLine(padding, scaledY, width - padding, scaledY, coordinatePaint)
+        }
+    }
+
+    private fun drawLinearScaleHorizontalLines(canvas: Canvas, contentHeight: Float) {
+        val yRange = chartOptions.yMax - chartOptions.yMin
+
+        var y = chartOptions.yMin
+        while (y <= chartOptions.yMax) {
+            val scaledY = height - padding - (y - chartOptions.yMin) * contentHeight / yRange
+            canvas.drawLine(padding, scaledY, width - padding, scaledY, coordinatePaint)
+            y += chartOptions.verticalStep
         }
     }
 
     private fun drawVerticalLines(canvas: Canvas) {
-        val startX = chartOptions.xMin
-        val endX = chartOptions.xMax
         val contentWidth = width - padding * 2
 
         if (chartOptions.isLogScaleX) {
-            val xMinLog = log10(chartOptions.xMin)
-            val xMaxLog = log10(chartOptions.xMax)
-            val xRangeLog = xMaxLog - xMinLog
-
-            var i = xMinLog.toInt()
-            while (i <= xMaxLog.toInt()) {
-                val x = 10.0.pow(i.toDouble()).toFloat()
-                val scaledX = padding + ((log10(x) - xMinLog) * contentWidth) / xRangeLog
-                canvas.drawLine(scaledX, padding, scaledX, height.toFloat() - padding, coordinatePaint)
-                i++
-            }
+            drawLogScaleVerticalLines(canvas, contentWidth)
         } else {
-            val xRange = chartOptions.xMax - chartOptions.xMin
+            drawLinearScaleVerticalLines(canvas, contentWidth)
+        }
+    }
 
-            var x = startX
-            while (x <= endX) {
-                val scaledX = padding + (x - chartOptions.xMin) * contentWidth / xRange
-                canvas.drawLine(scaledX, padding, scaledX, height.toFloat() - padding, coordinatePaint)
-                x += chartOptions.horizontalStep
-            }
+    private fun drawLogScaleVerticalLines(canvas: Canvas, contentWidth: Float) {
+        val xMinLog = log10(chartOptions.xMin)
+        val xMaxLog = log10(chartOptions.xMax)
+        val xRangeLog = xMaxLog - xMinLog
+
+        for (i in xMinLog.toInt()..xMaxLog.toInt()) {
+            val x = 10.0.pow(i.toDouble()).toFloat()
+            val scaledX = padding + ((log10(x) - xMinLog) * contentWidth) / xRangeLog
+            canvas.drawLine(scaledX, padding, scaledX, height - padding, coordinatePaint)
+        }
+    }
+
+    private fun drawLinearScaleVerticalLines(canvas: Canvas, contentWidth: Float) {
+        val xRange = chartOptions.xMax - chartOptions.xMin
+
+        var x = chartOptions.xMin
+        while (x <= chartOptions.xMax) {
+            val scaledX = padding + (x - chartOptions.xMin) * contentWidth / xRange
+            canvas.drawLine(scaledX, padding, scaledX, height - padding, coordinatePaint)
+            x += chartOptions.horizontalStep
         }
     }
 
@@ -115,135 +116,115 @@ class ChartRenderer @JvmOverloads constructor(
         val contentHeight = height - padding * 2
 
         if (chartOptions.isLogScaleX) {
-            val xMinLog = log10(chartOptions.xMin)
-            val xMaxLog = log10(chartOptions.xMax)
-            val xRangeLog = xMaxLog - xMinLog
-
-            drawXCoordinatesLog(canvas, contentWidth, xRangeLog, xMinLog)
+            drawLogScaleXCoordinates(canvas, contentWidth)
         } else {
-            val xRange = chartOptions.xMax - chartOptions.xMin
-
-            drawXCoordinates(canvas, contentWidth, xRange)
+            drawLinearScaleXCoordinates(canvas, contentWidth)
         }
 
         if (chartOptions.isLogScaleY) {
-            val yMinLog = log10(chartOptions.yMin)
-            val yMaxLog = log10(chartOptions.yMax)
-            val yRangeLog = yMaxLog - yMinLog
-
-            drawYCoordinatesLog(canvas, contentHeight, yRangeLog, yMinLog)
+            drawLogScaleYCoordinates(canvas, contentHeight)
         } else {
-            val yRange = chartOptions.yMax - chartOptions.yMin
-
-            drawYCoordinates(canvas, contentHeight, yRange)
+            drawLinearScaleYCoordinates(canvas, contentHeight)
         }
     }
 
-    private fun drawXCoordinatesLog(canvas: Canvas, contentWidth: Float, xRangeLog: Float, xMinLog: Float) {
-        val xStepLog = chartOptions.horizontalStep
+    private fun drawLogScaleXCoordinates(canvas: Canvas, contentWidth: Float) {
+        val xMinLog = log10(chartOptions.xMin)
+        val xMaxLog = log10(chartOptions.xMax)
+        val xRangeLog = xMaxLog - xMinLog
 
-        var i = xMinLog.toInt()
-        while (i <= xRangeLog.toInt()) {
+        for (i in xMinLog.toInt()..xRangeLog.toInt()) {
             val x = 10.0.pow(i.toDouble()).toFloat()
             val scaledX = padding + ((log10(x) - xMinLog) * contentWidth) / xRangeLog
-            val yPos = height - 20f
-            val text = x.toBigDecimal().toPlainString() // Convert to BigDecimal to avoid scientific notation
-            val textWidth = coordinatePaint.measureText(text)
-            canvas.drawText(text, scaledX - textWidth / 2, yPos, coordinatePaint)
-            i++
+            drawXCoordinateText(canvas, x.toBigDecimal().toPlainString(), scaledX)
         }
     }
 
-    private fun drawYCoordinatesLog(canvas: Canvas, contentHeight: Float, yRangeLog: Float, yMinLog: Float) {
-        val yStepLog = chartOptions.verticalStep
+    private fun drawLinearScaleXCoordinates(canvas: Canvas, contentWidth: Float) {
+        val xRange = chartOptions.xMax - chartOptions.xMin
 
-        var i = yMinLog.toInt()
-        while (i <= yRangeLog.toInt()) {
-            val y = 10.0.pow(i.toDouble()).toFloat()
-            val scaledY = height - padding - ((log10(y) - yMinLog) * contentHeight) / yRangeLog
-            val xPos = 20f
-            val text = y.toBigDecimal().toPlainString() // Convert to BigDecimal to avoid scientific notation
-            canvas.drawText(text, xPos, scaledY, coordinatePaint)
-            i++
-        }
-    }
-
-    private fun drawXCoordinates(canvas: Canvas, contentWidth: Float, xRange: Float) {
-        val xStep = chartOptions.horizontalStep
         var x = chartOptions.xMin
         while (x <= chartOptions.xMax) {
-            val scaledX = if (chartOptions.isLogScaleX) {
-                padding + ((log10(x) - log10(chartOptions.xMin)) * contentWidth) /
-                        (log10(chartOptions.xMax) - log10(chartOptions.xMin))
-            } else {
-                padding + (x - chartOptions.xMin) * contentWidth / xRange
-            }
-            val yPos = height - 20f
-            val text = x.toString()
-            val textWidth = coordinatePaint.measureText(text)
-            canvas.drawText(text, scaledX - textWidth / 2, yPos, coordinatePaint)
-            x += xStep
+            val scaledX = padding + (x - chartOptions.xMin) * contentWidth / xRange
+            drawXCoordinateText(canvas, x.toString(), scaledX)
+            x += chartOptions.horizontalStep
         }
     }
 
-    private fun drawYCoordinates(canvas: Canvas, contentHeight: Float, yRange: Float) {
-        val yStep = chartOptions.verticalStep
+    private fun drawXCoordinateText(canvas: Canvas, text: String, xPos: Float) {
+        val yPos = height - 20f
+        val textWidth = coordinatePaint.measureText(text)
+        canvas.drawText(text, xPos - textWidth / 2, yPos, coordinatePaint)
+    }
+
+    private fun drawLogScaleYCoordinates(canvas: Canvas, contentHeight: Float) {
+        val yMinLog = log10(chartOptions.yMin)
+        val yMaxLog = log10(chartOptions.yMax)
+        val yRangeLog = yMaxLog - yMinLog
+
+        for (i in yMinLog.toInt()..yRangeLog.toInt()) {
+            val y = 10.0.pow(i.toDouble()).toFloat()
+            val scaledY = height - padding - ((log10(y) - yMinLog) * contentHeight) / yRangeLog
+            drawYCoordinateText(canvas, y.toBigDecimal().toPlainString(), scaledY)
+        }
+    }
+
+    private fun drawLinearScaleYCoordinates(canvas: Canvas, contentHeight: Float) {
+        val yRange = chartOptions.yMax - chartOptions.yMin
+
         var y = chartOptions.yMin
         while (y <= chartOptions.yMax) {
-            val scaledY = if (chartOptions.isLogScaleY) {
-                height - padding - ((log10(y) - log10(chartOptions.yMin)) * contentHeight) /
-                        (log10(chartOptions.yMax) - log10(chartOptions.yMin))
-            } else {
-                height - padding - (y - chartOptions.yMin) * contentHeight / yRange
-            }
-            val xPos = 20f
-            val text = y.toString()
-            canvas.drawText(text, xPos, scaledY, coordinatePaint)
-            y += yStep
+            val scaledY = height - padding - (y - chartOptions.yMin) * contentHeight / yRange
+            drawYCoordinateText(canvas, y.toString(), scaledY)
+            y += chartOptions.verticalStep
         }
+    }
+
+    private fun drawYCoordinateText(canvas: Canvas, text: String, yPos: Float) {
+        val xPos = 20f
+        canvas.drawText(text, xPos, yPos, coordinatePaint)
     }
 
     private fun drawLineChart(canvas: Canvas) {
-        val dataset = datasetOptions.points
         setupPaintForLineChart()
 
         val scaleX = calculateScaleX()
         val scaleY = calculateScaleY()
 
-        val firstPoint = dataset[0]
-        val startX = calculateXCoordinate(firstPoint.first, scaleX)
-        val startY = calculateYCoordinate(firstPoint.second, scaleY)
-        drawPoint(startX, startY, canvas)
+        if (datasetOptions.points.isEmpty()) return
+
+        val points = datasetOptions.points.map {
+            PointF(calculateXCoordinate(it.first, scaleX), calculateYCoordinate(it.second, scaleY))
+        }
+
+        val firstPoint = points[0]
+        val startX = calculateXCoordinate(firstPoint.x, scaleX)
+        val startY = calculateYCoordinate(firstPoint.y, scaleY)
         path.moveTo(startX, startY)
 
-        for (i in 1 until dataset.size) {
-            val dataPoint = dataset[i]
-            val x = calculateXCoordinate(dataPoint.first, scaleX)
-            val y = calculateYCoordinate(dataPoint.second, scaleY)
-            drawPoint(x, y, canvas)
+        points.forEach { point ->
+            val x = calculateXCoordinate(point.x, scaleX)
+            val y = calculateYCoordinate(point.y, scaleY)
             path.lineTo(x, y)
-            Log.d("chart", "drawing point $x;$y")
         }
 
         canvas.drawPath(path, paint)
         resetPath()
-        Log.d("chart", "drawing the chart")
-        invalidate()
     }
 
     private fun drawSmoothLineChart(canvas: Canvas) {
-        val dataset = datasetOptions.points
         setupPaintForLineChart()
 
         val scaleX = calculateScaleX()
         val scaleY = calculateScaleY()
 
-        if (dataset.size < 2) return
+        if (datasetOptions.points.size < 2) return
 
-        val points = dataset.map { PointF(calculateXCoordinate(it.first, scaleX), calculateYCoordinate(it.second, scaleY)) }
+        val points = datasetOptions.points.map {
+            PointF(calculateXCoordinate(it.first, scaleX), calculateYCoordinate(it.second, scaleY))
+        }
 
         val firstPoint = points[0]
-        drawPoint(firstPoint.x, firstPoint.y, canvas)
         path.moveTo(firstPoint.x, firstPoint.y)
 
         for (i in 1 until points.size - 2) {
@@ -251,8 +232,6 @@ class ChartRenderer @JvmOverloads constructor(
             val p1 = points[i]
             val p2 = points[i + 1]
             val p3 = points[i + 2]
-
-            drawPoint(p1.x, p1.y, canvas)
 
             for (t in 0..100) {
                 val tScaled = t / 100f
@@ -262,23 +241,39 @@ class ChartRenderer @JvmOverloads constructor(
             }
         }
 
-        val penultimatePoint = points[points.size - 2]
-        val lastPoint = points[points.size - 1]
+        val lastPoint = points.last()
         path.lineTo(lastPoint.x, lastPoint.y)
-
-        drawPoint(penultimatePoint.x, penultimatePoint.y, canvas)
-        drawPoint(lastPoint.x, lastPoint.y, canvas)
 
         canvas.drawPath(path, paint)
         resetPath()
-        invalidate()
     }
 
     private fun catmullRom(p0: Float, p1: Float, p2: Float, p3: Float, t: Float): Float {
         val t2 = t * t
         val t3 = t2 * t
-
         return 0.5f * (2 * p1 + (-p0 + p2) * t + (2 * p0 - 5 * p1 + 4 * p2 - p3) * t2 + (-p0 + 3 * p1 - 3 * p2 + p3) * t3)
+    }
+
+    private fun drawPoints(canvas: Canvas) {
+        setupPaintForPoints()
+
+        val scaleX = calculateScaleX()
+        val scaleY = calculateScaleY()
+
+        datasetOptions.points.forEach { point ->
+            val x = calculateXCoordinate(point.first, scaleX)
+            val y = calculateYCoordinate(point.second, scaleY)
+            drawPoint(canvas, x, y)
+        }
+    }
+
+    private fun drawPoint(canvas: Canvas, x: Float, y: Float) {
+        canvas.drawCircle(x, y, chartOptions.pointRadius, paint)
+    }
+
+    private fun setupPaintForPoints() {
+        paint.color = getColorFromColorCode()
+        paint.style = Paint.Style.FILL
     }
 
     private fun setupPaintForLineChart() {
@@ -291,7 +286,7 @@ class ChartRenderer @JvmOverloads constructor(
         return if (chartOptions.isLogScaleX) {
             val logXMin = log10(chartOptions.xMin)
             val logXMax = log10(chartOptions.xMax)
-            (width - 2 * padding) / (logXMax - logXMin).toFloat()
+            (width - 2 * padding) / (logXMax - logXMin)
         } else {
             (width - 2 * padding) / (chartOptions.xMax - chartOptions.xMin)
         }
@@ -301,7 +296,7 @@ class ChartRenderer @JvmOverloads constructor(
         return if (chartOptions.isLogScaleY) {
             val logYMin = log10(chartOptions.yMin)
             val logYMax = log10(chartOptions.yMax)
-            (height - 2 * padding) / (logYMax - logYMin).toFloat()
+            (height - 2 * padding) / (logYMax - logYMin)
         } else {
             (height - 2 * padding) / (chartOptions.yMax - chartOptions.yMin)
         }
@@ -323,12 +318,6 @@ class ChartRenderer @JvmOverloads constructor(
         } else {
             height - padding - (y - chartOptions.yMin) * scaleY
         }
-    }
-
-    private fun drawPoint(x: Float, y: Float, canvas: Canvas) {
-        paint.style = Paint.Style.FILL
-        canvas.drawCircle(x, y, chartOptions.pointRadius, paint)
-        paint.style = Paint.Style.STROKE
     }
 
     private fun resetPath() {
