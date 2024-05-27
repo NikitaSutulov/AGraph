@@ -25,3 +25,5 @@ $ ./gradlew assembleDebug
 ```
 $ ./gradlew installDebug
 ```
+
+Також можна ознайомитися з дизайн-документом до цього застосунку за [цим посиланням](https://docs.google.com/document/d/1If3gdSqWzzEVaw-FXVKD_BM7VYmbRFjaHInh5HzFEOI).
