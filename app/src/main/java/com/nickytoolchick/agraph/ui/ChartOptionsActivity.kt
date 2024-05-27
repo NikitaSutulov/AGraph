@@ -6,6 +6,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ArrayAdapter
+import android.widget.EditText
 import android.widget.Toast
 import com.nickytoolchick.agraph.data.ChartOptions
 import com.nickytoolchick.agraph.data.Constants
@@ -14,12 +15,11 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-
 class ChartOptionsActivity : AppCompatActivity() {
 
-    var colors = arrayOf("BLACK", "RED", "GREEN", "BLUE")
-    var chartOptions = ChartOptions()
-    lateinit var mainActivityIntent: Intent
+    private val colors = arrayOf("BLACK", "RED", "GREEN", "BLUE")
+    private var chartOptions = ChartOptions()
+    private lateinit var mainActivityIntent: Intent
     private lateinit var binding: ActivityChartOptionsBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,7 +33,10 @@ class ChartOptionsActivity : AppCompatActivity() {
         binding.submitChartOptionsButton.setOnClickListener {
             if (validateInput()) {
                 updateChartOptions()
-                mainActivityIntent.putExtra(Constants.NEW_CHART_OPTIONS, Json.encodeToString(chartOptions))
+                mainActivityIntent.putExtra(
+                    Constants.NEW_CHART_OPTIONS,
+                    Json.encodeToString(chartOptions)
+                )
                 setResult(Activity.RESULT_OK, mainActivityIntent)
                 finish()
             }
@@ -41,12 +44,16 @@ class ChartOptionsActivity : AppCompatActivity() {
     }
 
     private fun loadChartOptions() {
-        chartOptions = Json.decodeFromString(mainActivityIntent.getStringExtra(Constants.STABLE_CHART_OPTIONS)!!)
+        chartOptions =
+            Json.decodeFromString(mainActivityIntent.getStringExtra(Constants.STABLE_CHART_OPTIONS)!!)
+        loadInputs()
+        setupCheckedTextViewsClickHandlers()
+    }
+
+    private fun loadInputs() {
         loadEditTexts()
         loadSpinner()
         loadCheckedTextViews()
-        handleCheckedTextViewsClick()
-
     }
 
     private fun loadEditTexts() {
@@ -74,24 +81,19 @@ class ChartOptionsActivity : AppCompatActivity() {
         binding.lineSmoothCheckedTV.isChecked = chartOptions.isSmooth
     }
 
-    private fun handleCheckedTextViewsClick() {
-        binding.logScaleXCheckedTV.setOnClickListener {
-            binding.logScaleXCheckedTV.isChecked = !binding.logScaleXCheckedTV.isChecked
-        }
+    private fun setupCheckedTextViewsClickHandlers() {
+        val checkedTextViews = listOf(
+            binding.logScaleXCheckedTV,
+            binding.logScaleYCheckedTV,
+            binding.showHorizontalLinesCheckedTV,
+            binding.showVerticalLinesCheckedTV,
+            binding.lineSmoothCheckedTV
+        )
 
-        binding.logScaleYCheckedTV.setOnClickListener {
-            binding.logScaleYCheckedTV.isChecked = !binding.logScaleYCheckedTV.isChecked
-        }
-
-        binding.showHorizontalLinesCheckedTV.setOnClickListener {
-            binding.showHorizontalLinesCheckedTV.isChecked = !binding.showHorizontalLinesCheckedTV.isChecked
-        }
-
-        binding.showVerticalLinesCheckedTV.setOnClickListener {
-            binding.showVerticalLinesCheckedTV.isChecked = !binding.showVerticalLinesCheckedTV.isChecked
-        }
-        binding.lineSmoothCheckedTV.setOnClickListener {
-            binding.lineSmoothCheckedTV.isChecked = !binding.lineSmoothCheckedTV.isChecked
+        for (checkedTextView in checkedTextViews) {
+            checkedTextView.setOnClickListener {
+                checkedTextView.isChecked = !checkedTextView.isChecked
+            }
         }
     }
 
@@ -102,9 +104,9 @@ class ChartOptionsActivity : AppCompatActivity() {
     }
 
     private fun validateInput(): Boolean {
-        return validateInputNotEmpty()
-                && validateInputNoZerosWhenLog()
-                && validateInputNoNegativeRanges()
+        return validateInputNotEmpty() &&
+                validateInputNoZerosWhenLog() &&
+                validateInputNoNegativeRanges()
     }
 
     private fun validateInputNotEmpty(): Boolean {
@@ -119,9 +121,9 @@ class ChartOptionsActivity : AppCompatActivity() {
             binding.pointRadiusEditText
         )
 
-        for (i in viewsToCheck.indices) {
-            if (viewsToCheck[i].text.toString().isNullOrEmpty()) {
-                viewsToCheck[i].error = "This value must not be empty!"
+        for (view in viewsToCheck) {
+            if (view.text.toString().isEmpty()) {
+                view.error = "This value must not be empty!"
                 return false
             }
         }
@@ -129,32 +131,32 @@ class ChartOptionsActivity : AppCompatActivity() {
     }
 
     private fun validateInputNoZerosWhenLog(): Boolean {
-        return validateInputNoZerosWhenLogX() && validateInputNoZerosWhenLogY()
+        return validateInputNoZerosWhenLog(
+            binding.logScaleXCheckedTV.isChecked,
+            binding.xMinEditText,
+            binding.xMaxEditText,
+            "x"
+        ) &&
+                validateInputNoZerosWhenLog(
+                    binding.logScaleYCheckedTV.isChecked,
+                    binding.yMinEditText,
+                    binding.yMaxEditText,
+                    "y"
+                )
     }
 
-    private fun validateInputNoZerosWhenLogX(): Boolean {
-        val isLogScaleXEnabled = binding.logScaleXCheckedTV.isChecked
-        val isXMinOrXMaxZero = binding.xMinEditText.text.toString().toFloat() == 0f
-                || binding.xMaxEditText.text.toString().toFloat() == 0f
-        if (isLogScaleXEnabled && isXMinOrXMaxZero) {
+    private fun validateInputNoZerosWhenLog(
+        isLogScaleEnabled: Boolean,
+        minEditText: EditText,
+        maxEditText: EditText,
+        axis: String
+    ): Boolean {
+        if (isLogScaleEnabled && (minEditText.text.toString()
+                .toFloat() == 0f || maxEditText.text.toString().toFloat() == 0f)
+        ) {
             Toast.makeText(
                 this,
-                "xMin or xMax cannot be zero when scaled logarithmically!",
-                Toast.LENGTH_SHORT
-            ).show()
-            return false
-        }
-        return true
-    }
-
-    private fun validateInputNoZerosWhenLogY(): Boolean {
-        val isLogScaleYEnabled = binding.logScaleYCheckedTV.isChecked
-        val isXMinOrYMaxZero = binding.yMinEditText.text.toString().toFloat() == 0f
-                || binding.yMaxEditText.text.toString().toFloat() == 0f
-        if (isLogScaleYEnabled && isXMinOrYMaxZero) {
-            Toast.makeText(
-                this,
-                "yMin or yMax cannot be zero when scaled logarithmically!",
+                "$axis Min or $axis Max cannot be zero when scaled logarithmically!",
                 Toast.LENGTH_SHORT
             ).show()
             return false
@@ -163,25 +165,19 @@ class ChartOptionsActivity : AppCompatActivity() {
     }
 
     private fun validateInputNoNegativeRanges(): Boolean {
-        return validateInputNoNegativeRangeX()
-                && validateInputNoNegativeRangeY()
+        return validateInputNoNegativeRange(binding.xMinEditText, binding.xMaxEditText, "x") &&
+                validateInputNoNegativeRange(binding.yMinEditText, binding.yMaxEditText, "y")
     }
 
-    private fun validateInputNoNegativeRangeX(): Boolean {
-        val xMax = binding.xMaxEditText.text.toString().toFloat()
-        val xMin = binding.xMinEditText.text.toString().toFloat()
-        if (xMax - xMin <= 0) {
-            Toast.makeText(this, "x range cannot be negative!", Toast.LENGTH_SHORT).show()
-            return false
-        }
-        return true
-    }
-
-    private fun validateInputNoNegativeRangeY(): Boolean {
-        val yMax = binding.yMaxEditText.text.toString().toFloat()
-        val yMin = binding.yMinEditText.text.toString().toFloat()
-        if (yMax - yMin <= 0) {
-            Toast.makeText(this, "y range cannot be negative!", Toast.LENGTH_SHORT).show()
+    private fun validateInputNoNegativeRange(
+        minEditText: EditText,
+        maxEditText: EditText,
+        axis: String
+    ): Boolean {
+        val min = minEditText.text.toString().toFloat()
+        val max = maxEditText.text.toString().toFloat()
+        if (max - min <= 0) {
+            Toast.makeText(this, "$axis range cannot be negative!", Toast.LENGTH_SHORT).show()
             return false
         }
         return true
