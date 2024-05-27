@@ -14,17 +14,15 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-
 class DatasetOptionsActivity : AppCompatActivity() {
 
-    private var datasetOptions = DatasetOptions()
-    lateinit var mainActivityIntent: Intent
+    private lateinit var datasetOptions: DatasetOptions
+    private lateinit var mainActivityIntent: Intent
     private lateinit var binding: ActivityDatasetOptionsBinding
-    var points: MutableList<Pair<Float, Float>> = mutableListOf()
+    private val points: MutableList<Pair<Float, Float>> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         binding = ActivityDatasetOptionsBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
@@ -35,7 +33,10 @@ class DatasetOptionsActivity : AppCompatActivity() {
             if (validateInput()) {
                 updateDatasetOptions()
                 datasetOptions.points.sortBy { it.first }
-                mainActivityIntent.putExtra(Constants.NEW_DATASET_OPTIONS, Json.encodeToString(datasetOptions))
+                mainActivityIntent.putExtra(
+                    Constants.NEW_DATASET_OPTIONS,
+                    Json.encodeToString(datasetOptions)
+                )
                 setResult(Activity.RESULT_OK, mainActivityIntent)
                 finish()
             }
@@ -64,12 +65,13 @@ class DatasetOptionsActivity : AppCompatActivity() {
     }
 
     private fun loadDatasetOptions() {
-        datasetOptions = Json.decodeFromString(mainActivityIntent.getStringExtra(Constants.STABLE_DATASET_OPTIONS)!!)
+        datasetOptions =
+            Json.decodeFromString(mainActivityIntent.getStringExtra(Constants.STABLE_DATASET_OPTIONS)!!)
         loadPoints()
     }
 
     private fun loadPoints() {
-        points = datasetOptions.points.toMutableList()
+        points.addAll(datasetOptions.points)
         updatePointsTextView()
     }
 
@@ -77,7 +79,7 @@ class DatasetOptionsActivity : AppCompatActivity() {
         val x = binding.newPointXEditText.text.toString().toFloat()
         val y = binding.newPointYEditText.text.toString().toFloat()
         val newPoint = Pair(x, y)
-        if (!(points.filter { it == newPoint }.any())) {
+        if (newPoint !in points) {
             points.add(newPoint)
             updatePointsTextView()
         } else {
@@ -89,7 +91,7 @@ class DatasetOptionsActivity : AppCompatActivity() {
         val x = binding.newPointXEditText.text.toString().toFloat()
         val y = binding.newPointYEditText.text.toString().toFloat()
         val pointToDelete = Pair(x, y)
-        if (points.filter { it == pointToDelete }.any()) {
+        if (pointToDelete in points) {
             points.remove(pointToDelete)
             updatePointsTextView()
         } else {
@@ -98,46 +100,41 @@ class DatasetOptionsActivity : AppCompatActivity() {
     }
 
     private fun updatePointsTextView() {
-        var finalText = ""
-        for (i in points.indices) {
-            finalText += "${points[i].first} ${points[i].second}\n"
-        }
+        val finalText = points.joinToString("\n") { "${it.first} ${it.second}" }
         binding.pointsTV.text = finalText
     }
 
-    private fun showToast(context: Context, message: String){
-        val toast = Toast.makeText(context, message, Toast.LENGTH_LONG)
-        toast.show()
+    private fun showToast(context: Context, message: String) {
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
     }
 
     private fun validateInput(): Boolean {
-        if (binding.pointsTV.text.toString().isNullOrEmpty()) {
+        return if (binding.pointsTV.text.toString().isNullOrEmpty()) {
             binding.pointsTV.error = "You must put in some points!"
-            return false
+            false
+        } else {
+            true
         }
-        return true
     }
 
     private fun validateNewPoint(): Boolean {
-        if (binding.newPointXEditText.text.toString().isNullOrEmpty()
-            || binding.newPointYEditText.text.toString().isNullOrEmpty()) {
-            return false
-        }
-        return true
+        return !(binding.newPointXEditText.text.toString().isNullOrEmpty()
+                || binding.newPointYEditText.text.toString().isNullOrEmpty())
     }
 
     private fun showDeleteAllPointsDialog() {
-        val builder = AlertDialog.Builder(this)
-        builder.setTitle("Delete all points")
-        builder.setMessage("Do you really want to delete all points?")
-        builder.setPositiveButton("Yes") { dialog, _ ->
-            points.clear()
-            updatePointsTextView()
-            dialog.dismiss()
-        }
-        builder.setNegativeButton("No") { dialog, _ ->
-            dialog.dismiss()
-        }
-        builder.create().show()
+        AlertDialog.Builder(this)
+            .setTitle("Delete all points")
+            .setMessage("Do you really want to delete all points?")
+            .setPositiveButton("Yes") { dialog, _ ->
+                points.clear()
+                updatePointsTextView()
+                dialog.dismiss()
+            }
+            .setNegativeButton("No") { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+            .show()
     }
 }
