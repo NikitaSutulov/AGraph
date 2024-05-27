@@ -6,8 +6,7 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.ArrayAdapter
-import android.widget.EditText
-import androidx.core.view.children
+import android.widget.Toast
 import com.nickytoolchick.agraph.data.ChartOptions
 import com.nickytoolchick.agraph.data.Constants
 import com.nickytoolchick.agraph.databinding.ActivityChartOptionsBinding
@@ -103,6 +102,12 @@ class ChartOptionsActivity : AppCompatActivity() {
     }
 
     private fun validateInput(): Boolean {
+        return validateInputNotEmpty()
+                && validateInputNoZerosWhenLog()
+                && validateInputNoNegativeRanges()
+    }
+
+    private fun validateInputNotEmpty(): Boolean {
         val viewsToCheck = listOf(
             binding.horizontalStepEditText,
             binding.verticalStepEditText,
@@ -119,10 +124,65 @@ class ChartOptionsActivity : AppCompatActivity() {
                 viewsToCheck[i].error = "This value must not be empty!"
                 return false
             }
-            if (viewsToCheck[i].text.toString().toFloat() == 0f) {
-                viewsToCheck[i].error = "This value must not be zero!"
-                return false
-            }
+        }
+        return true
+    }
+
+    private fun validateInputNoZerosWhenLog(): Boolean {
+        return validateInputNoZerosWhenLogX() && validateInputNoZerosWhenLogY()
+    }
+
+    private fun validateInputNoZerosWhenLogX(): Boolean {
+        val isLogScaleXEnabled = binding.logScaleXCheckedTV.isChecked
+        val isXMinOrXMaxZero = binding.xMinEditText.text.toString().toFloat() == 0f
+                || binding.xMaxEditText.text.toString().toFloat() == 0f
+        if (isLogScaleXEnabled && isXMinOrXMaxZero) {
+            Toast.makeText(
+                this,
+                "xMin or xMax cannot be zero when scaled logarithmically!",
+                Toast.LENGTH_SHORT
+            ).show()
+            return false
+        }
+        return true
+    }
+
+    private fun validateInputNoZerosWhenLogY(): Boolean {
+        val isLogScaleYEnabled = binding.logScaleYCheckedTV.isChecked
+        val isXMinOrYMaxZero = binding.yMinEditText.text.toString().toFloat() == 0f
+                || binding.yMaxEditText.text.toString().toFloat() == 0f
+        if (isLogScaleYEnabled && isXMinOrYMaxZero) {
+            Toast.makeText(
+                this,
+                "yMin or yMax cannot be zero when scaled logarithmically!",
+                Toast.LENGTH_SHORT
+            ).show()
+            return false
+        }
+        return true
+    }
+
+    private fun validateInputNoNegativeRanges(): Boolean {
+        return validateInputNoNegativeRangeX()
+                && validateInputNoNegativeRangeY()
+    }
+
+    private fun validateInputNoNegativeRangeX(): Boolean {
+        val xMax = binding.xMaxEditText.text.toString().toFloat()
+        val xMin = binding.xMinEditText.text.toString().toFloat()
+        if (xMax - xMin <= 0) {
+            Toast.makeText(this, "x range cannot be negative!", Toast.LENGTH_SHORT).show()
+            return false
+        }
+        return true
+    }
+
+    private fun validateInputNoNegativeRangeY(): Boolean {
+        val yMax = binding.yMaxEditText.text.toString().toFloat()
+        val yMin = binding.yMinEditText.text.toString().toFloat()
+        if (yMax - yMin <= 0) {
+            Toast.makeText(this, "y range cannot be negative!", Toast.LENGTH_SHORT).show()
+            return false
         }
         return true
     }

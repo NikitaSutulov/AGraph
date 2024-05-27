@@ -77,17 +77,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun validateOptions() {
-        val numbersToCheck = listOf(
-            chartOptions.horizontalStep,
-            chartOptions.verticalStep,
-            chartOptions.xMin,
-            chartOptions.xMax,
-            chartOptions.yMin,
-            chartOptions.yMax,
-            chartOptions.strokeSize,
-            chartOptions.pointRadius
-        )
-        binding.renderChartButton.isEnabled = (!numbersToCheck.any { it == 0f }
-                && datasetOptions.points.isNotEmpty())
+        binding.renderChartButton.isEnabled = (datasetOptions.points.isNotEmpty())
     }
 }
