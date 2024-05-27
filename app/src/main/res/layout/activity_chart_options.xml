@@ -9,12 +9,12 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:paddingBottom="60dp"
+        app:layout_constraintBottom_toTopOf="@+id/submitChartOptionsButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@+id/submitChartOptionsButton"
-        android:layout_margin="10dp"
-        android:paddingBottom="60dp">
+        app:layout_constraintTop_toTopOf="parent">
 
         <LinearLayout
             android:id="@+id/inputChartOptionsLayout"
@@ -25,9 +25,9 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Here you can configure chart options"
                 android:gravity="center"
-                android:textSize="10pt"/>
+                android:text="Here you can configure chart options"
+                android:textSize="10pt" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -38,8 +38,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:inputType="numberDecimal"
-                    android:hint="horizontal step" />
+                    android:hint="horizontal step"
+                    android:inputType="numberDecimal" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
@@ -51,8 +51,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:inputType="numberDecimal"
-                    android:hint="vertical step" />
+                    android:hint="vertical step"
+                    android:inputType="numberDecimal" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -65,8 +65,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:inputType="numberDecimal"
-                    android:hint="xMin" />
+                    android:hint="xMin"
+                    android:inputType="numberDecimal" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -79,8 +79,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:inputType="numberDecimal"
-                    android:hint="xMax" />
+                    android:hint="xMax"
+                    android:inputType="numberDecimal" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -93,8 +93,8 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:inputType="numberDecimal"
-                    android:hint="yMin" />
+                    android:hint="yMin"
+                    android:inputType="numberDecimal" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
@@ -107,42 +107,42 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:inputType="numberDecimal"
-                    android:hint="yMax" />
+                    android:hint="yMax"
+                    android:inputType="numberDecimal" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
             <CheckedTextView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:checkMark="?android:attr/listChoiceIndicatorMultiple"
-                android:checked="false"
                 android:id="@+id/logScaleXCheckedTV"
-                android:text="Scale the X axis logarithmically"/>
-
-            <CheckedTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checkMark="?android:attr/listChoiceIndicatorMultiple"
                 android:checked="false"
+                android:text="Scale the X axis logarithmically" />
+
+            <CheckedTextView
                 android:id="@+id/logScaleYCheckedTV"
-                android:text="Scale the Y axis logarithmically"/>
-
-            <CheckedTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checkMark="?android:attr/listChoiceIndicatorMultiple"
                 android:checked="false"
+                android:text="Scale the Y axis logarithmically" />
+
+            <CheckedTextView
                 android:id="@+id/showHorizontalLinesCheckedTV"
-                android:text="Show horizontal lines in the grid"/>
-
-            <CheckedTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:checkMark="?android:attr/listChoiceIndicatorMultiple"
                 android:checked="false"
+                android:text="Show horizontal lines in the grid" />
+
+            <CheckedTextView
                 android:id="@+id/showVerticalLinesCheckedTV"
-                android:text="Show vertical lines in the grid"/>
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:checkMark="?android:attr/listChoiceIndicatorMultiple"
+                android:checked="false"
+                android:text="Show vertical lines in the grid" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"

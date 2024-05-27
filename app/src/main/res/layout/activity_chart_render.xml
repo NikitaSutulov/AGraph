@@ -17,10 +17,10 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <com.nickytoolchick.agraph.render.ChartRenderer
+            android:id="@+id/chartRenderer"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:id="@+id/chartRenderer"
-            android:layout_margin="5dp"/>
+            android:layout_margin="5dp" />
 
     </FrameLayout>
 
@@ -37,21 +37,19 @@
             android:id="@+id/exportButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_margin="10dp"
-            android:text="Export as PNG"/>
+            android:layout_weight="1"
+            android:text="Export as PNG" />
 
         <Button
             android:id="@+id/shareButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:layout_margin="10dp"
-            android:text="Share image"/>
+            android:layout_weight="1"
+            android:text="Share image" />
 
     </LinearLayout>
-
-
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
